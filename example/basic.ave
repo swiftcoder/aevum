@@ -1,0 +1,28 @@
+
+cdecl fn puts(arg : str);
+
+fn do_things(hello : Hello) {
+    hello._value = 5;
+    hello._next = 25.7;
+    hello.greeting = "goodbye";
+    puts(hello.greeting);
+}
+
+struct Hello {
+    _value : i32,
+    _next : f32,
+    greeting : str
+}
+
+// this is a comment
+
+fn main() {
+	let hello : Hello;
+    hello.greeting = "hello";
+
+	do_things(hello);
+
+    puts(hello.greeting);
+
+	puts("Hello, \"World\"!");
+}
