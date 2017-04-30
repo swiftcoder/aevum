@@ -2,15 +2,18 @@
 cdecl fn puts(arg : str);
 
 fn do_things(hello : Hello) {
-    hello._value = 5;
-    hello._next = 25.7;
+    hello.value = 5;
+    hello.next = 0x2f.7e32;
     hello.greeting = "goodbye";
     puts(hello.greeting);
 }
 
+fn do_nothing() {
+}
+
 struct Hello {
-    _value : i32,
-    _next : f32,
+    value : i32,
+    next : f32,
     greeting : str
 }
 

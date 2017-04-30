@@ -1,5 +1,5 @@
 __pycache__
-*.out
-*.ll
-*.s
-*.tokens
+parser.out
+parsetab.py
+build
+

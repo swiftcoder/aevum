@@ -1,18 +1,18 @@
 
 .PHONY: all test
 
-all: aevumLexer.py aevumParser.py aevumListener.py
+all: test
 
-aevumLexer.py aevumParser.py aevumListener.py: aevum.g4
-	antlr4 -Dlanguage=Python3 $<
+test: build/a.out
 
-test: a.out
+build/a.out: build/out.s
+	clang -o $@ $<
 
-a.out: out.s
-	clang $<
+build/out.s: build/out.ll
+	 clang -Os -S -o $@ $<
 
-out.s: out.ll
-	 clang -Os -S $<
+build/out.ll: example/basic.ave *.py
+	./compiler.py $< >$@
 
-out.ll: example/basic.ave *.py
-	./driver.py $< >$@
+clean:
+	rm -rf build/*

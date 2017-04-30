@@ -3,8 +3,8 @@ import sys
 
 from llvmlite import ir
 
-from inspect import cleandoc
 from symbols import *
+from typemap import *
 
 next_serial = 1
 
@@ -28,13 +28,13 @@ class ConstantString(object):
         z = ir.Constant(ir.IntType(32), 0)
         g = builder.gep(glob, [z, z])
         stack.append(g)
-    
+
     def __repr__(self):
         return 'string "%s"' % (self.data)
 
 class ConstantInt(object):
     def __init__(self, value):
-        self.value = value
+        self.value = int(value)
 
     def typecheck(self, symboltable):
         pass
@@ -43,9 +43,15 @@ class ConstantInt(object):
         i = ir.Constant(ir.IntType(32), self.value)
         stack.append(i)
 
+    def __repr__(self):
+        return 'int %s' % (self.value)
+
 class ConstantFloat(object):
     def __init__(self, value):
-        self.value = value
+        if value.startswith('0x') or value.startswith('0X'):
+            self.value = float.fromhex(value)
+        else:
+            self.value = float(value)
 
     def typecheck(self, symboltable):
         pass
@@ -54,7 +60,10 @@ class ConstantFloat(object):
         i = ir.Constant(ir.FloatType(), self.value)
         stack.append(i)
 
-class Var(object):
+    def __repr__(self):
+        return 'float %s' % (self.value)
+
+class VarRef(object):
     def __init__(self, name):
         self.name = name
 
@@ -97,7 +106,7 @@ class Member(object):
         return g
 
     def __repr__(self):
-        return 'member %s.%s' % (str(self.target), self.name)
+        return '%s.%s' % (str(self.target), self.name)
 
 class Call(object):
     def __init__(self, func, args):
@@ -115,7 +124,8 @@ class Call(object):
         self.func.call(builder, stack)
 
     def __repr__(self):
-        return 'call %s' % (str(self.func))
+        args = ', '.join(str(a) for a in self.args) if self.args else ''
+        return '%s(%s)' % (str(self.func), args)
 
 class VarDecl(object):
     def __init__(self, name, _type):
@@ -125,9 +135,9 @@ class VarDecl(object):
     def typecheck(self, symboltable):
         self.type = symboltable[self.type]
         symboltable[self.name] = self
-    
+
     def emit(self, builder, stack):
-        self.item = builder.alloca(self.type.type)
+        self.item = builder.alloca(self.type.irtype)
         stack.append(builder.load(self.item))
 
     def fetch(self, builder, stack):
@@ -135,6 +145,9 @@ class VarDecl(object):
 
     def reference(self, builder):
         return self.item
+
+    def __repr__(self):
+        return '%s : %s' % (self.name, self.type)
 
 class Assignment(object):
     def __init__(self, target, value):
@@ -151,19 +164,28 @@ class Assignment(object):
         v = stack.pop()
         builder.store(v, t)
 
+    def __repr__(self):
+        return '%s = %s' % (self.target, self.value)
+
 class Struct(object):
     def __init__(self, name, members):
         self.name = name
         self.members = members
 
     def typecheck(self, typemap):
-        for _, m in self.members.items():
+        for m in self.members:
             m.typecheck(typemap)
 
-        self.type = ir.LiteralStructType(m.type.type for _, m in self.members.items())
-    
+        self.irtype = ir.LiteralStructType(m.type.irtype for m in self.members)
+        self.type = StructType(self.name, {m.name: m.type for m in self.members}, self.irtype)
+        typemap[self.name] = self.type
+
     def emit(self, module):
         pass
+
+    def __repr__(self):
+        members = ', '.join(str(s) for s in self.members) if self.members else ''
+        return 'struct %s {%s}' % (self.name, members)
 
 class Function(object):
     def __init__(self, name, args, body, symboltable):
@@ -173,20 +195,22 @@ class Function(object):
         self.symboltable = SymbolTable(symboltable)
 
     def typecheck(self, typemap):
-        for n, a in self.args.items():
+        for a in self.args:
             a.typecheck(typemap)
-            self.symboltable[n] = a
+            self.symboltable[a.name] = a
 
         for b in self.body:
             b.typecheck(self.symboltable)
 
+        self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
+        typemap[self.name] = self
+
     def emit(self, module):
-        self.type = ir.FunctionType(ir.VoidType(), (a.type.type for _, a in self.args.items()), False)
-        self.func = ir.Function(module, self.type, self.name)
+        self.func = ir.Function(module, self.irtype, self.name)
         block = self.func.append_basic_block('entry')
         builder = ir.IRBuilder(block)
-        for a, i in zip(self.args.values(), self.func.args):
-            t = builder.alloca(a.type.type)
+        for a, i in zip(self.args, self.func.args):
+            t = builder.alloca(a.type.irtype)
             builder.store(i, t)
             a.item = t
         stack = []
@@ -200,22 +224,32 @@ class Function(object):
         del stack[-count:]
         stack.append(builder.call(self.func, args))
 
+    def __repr__(self):
+        args = ', '.join(str(a) for a in self.args) if self.args else ''
+        body = '; '.join(str(s) for s in self.body) + ';' if self.body else ''
+        return 'fn %s(%s) {%s}' % (self.name, args, body)
+
 class CFunction(object):
     def __init__(self, name, args):
         self.name = name
         self.args = args
 
     def typecheck(self, typemap):
-        for _, a in self.args.items():
+        for a in self.args:
             a.typecheck(typemap)
 
-        self.type = ir.FunctionType(ir.VoidType(), (a.type.type for _, a in self.args.items()), False)
+        self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
+        typemap[self.name] = self
 
     def emit(self, module):
-        self.func = ir.Function(module, self.type, self.name)
+        self.func = ir.Function(module, self.irtype, self.name)
 
     def call(self, builder, stack):
         count = len(self.func.args)
         args = stack[-count:]
         del stack[-count:]
         stack.append(builder.call(self.func, args))
+
+    def __repr__(self):
+        args = ', '.join(str(a) for a in self.args) if self.args else ''
+        return 'cdecl fn %s(%s)' % (self.name, args)
