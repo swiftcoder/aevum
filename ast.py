@@ -8,13 +8,20 @@ from typemap import *
 
 next_serial = 1
 
-class ConstantString(object):
-    def __init__(self, data):
-        data = data[1:-1]
-        self.data = data.replace('\\\"', '\"') + '\0'
+class AST(object):
+    def populate_symbol_table(self, symboltable):
+        pass
+
+    def dependent_types(self, symboltable):
+        return [(self, [])]
 
     def typecheck(self, symboltable):
         pass
+
+class ConstantString(AST):
+    def __init__(self, data):
+        data = data[1:-1]
+        self.data = data.replace('\\\"', '\"') + '\0'
 
     def emit(self, builder, stack):
         global next_serial
@@ -32,12 +39,9 @@ class ConstantString(object):
     def __repr__(self):
         return 'string "%s"' % (self.data)
 
-class ConstantInt(object):
+class ConstantInt(AST):
     def __init__(self, value):
         self.value = int(value)
-
-    def typecheck(self, symboltable):
-        pass
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.IntType(32), self.value)
@@ -46,15 +50,12 @@ class ConstantInt(object):
     def __repr__(self):
         return 'int %s' % (self.value)
 
-class ConstantFloat(object):
+class ConstantFloat(AST):
     def __init__(self, value):
         if value.startswith('0x') or value.startswith('0X'):
             self.value = float.fromhex(value)
         else:
             self.value = float(value)
-
-    def typecheck(self, symboltable):
-        pass
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.FloatType(), self.value)
@@ -63,12 +64,13 @@ class ConstantFloat(object):
     def __repr__(self):
         return 'float %s' % (self.value)
 
-class VarRef(object):
+class VarRef(AST):
     def __init__(self, name):
         self.name = name
 
-    def typecheck(self, symboltable):
+    def dependent_types(self, symboltable):
         self.item = symboltable[self.name]
+        return [(self, [self.item])]
 
     def emit(self, builder, stack):
         pass
@@ -85,10 +87,14 @@ class VarRef(object):
     def __repr__(self):
         return 'var %s' % (self.name)
 
-class Member(object):
+class Member(AST):
     def __init__(self, target, name):
         self.target = target
         self.name = name
+
+    def dependent_types(self, symboltable):
+        target_deps = self.target.dependent_types(symboltable)
+        return [(self, [self.target])] + target_deps
 
     def typecheck(self, symboltable):
         self.target.typecheck(symboltable)
@@ -108,10 +114,16 @@ class Member(object):
     def __repr__(self):
         return '%s.%s' % (str(self.target), self.name)
 
-class Call(object):
+class Call(AST):
     def __init__(self, func, args):
         self.func = func
         self.args = args
+
+    def dependent_types(self, symboltable):
+        dependancies = self.func.dependent_types(symboltable)
+        for a in self.args:
+            dependancies += a.dependent_types(symboltable)
+        return [(self, [self.func] + self.args)] + dependancies
 
     def typecheck(self, symboltable):
         self.func.typecheck(symboltable)
@@ -127,14 +139,17 @@ class Call(object):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
         return '%s(%s)' % (str(self.func), args)
 
-class VarDecl(object):
+class VarDecl(AST):
     def __init__(self, name, _type):
         self.name = name
         self.type = _type
 
-    def typecheck(self, symboltable):
-        self.type = symboltable[self.type]
+    def populate_symbol_table(self, symboltable):
         symboltable[self.name] = self
+
+    def dependent_types(self, symboltable):
+        self.type = symboltable[self.type]
+        return [(self, [self.type])]
 
     def emit(self, builder, stack):
         self.item = builder.alloca(self.type.irtype)
@@ -149,10 +164,15 @@ class VarDecl(object):
     def __repr__(self):
         return '%s : %s' % (self.name, self.type)
 
-class Assignment(object):
+class Assignment(AST):
     def __init__(self, target, value):
         self.target = target
         self.value = value
+
+    def dependent_types(self, symboltable):
+        dependencies = self.target.dependent_types(symboltable)
+        dependencies += self.value.dependent_types(symboltable)
+        return [(self, [self.target, self.value])] + dependencies
 
     def typecheck(self, symboltable):
         self.target.typecheck(symboltable)
@@ -167,43 +187,67 @@ class Assignment(object):
     def __repr__(self):
         return '%s = %s' % (self.target, self.value)
 
-class Struct(object):
+class Struct(AST):
     def __init__(self, name, members):
         self.name = name
-        self.members = members
+        self._members = members
+        self.members = {m.name: m for m in self._members}
 
-    def typecheck(self, typemap):
-        for m in self.members:
-            m.typecheck(typemap)
+    def populate_symbol_table(self, symboltable):
+        symboltable[self.name] = self
 
-        self.irtype = ir.LiteralStructType(m.type.irtype for m in self.members)
-        self.type = StructType(self.name, {m.name: m.type for m in self.members}, self.irtype)
-        typemap[self.name] = self.type
+    def dependent_types(self, symboltable):
+        dependencies = []
+        for m in self._members:
+            dependencies += m.dependent_types(symboltable)
+        return [(self, self._members)] + dependencies
+
+    def typecheck(self, symboltable):
+        for m in self._members:
+            m.typecheck(symboltable)
+
+        self.irtype = ir.LiteralStructType(m.type.irtype for m in self._members)
+        self.type = StructType(self.name, {m.name: m.type for m in self._members}, self.irtype)
 
     def emit(self, module):
         pass
 
     def __repr__(self):
-        members = ', '.join(str(s) for s in self.members) if self.members else ''
+        members = ', '.join(str(s) for s in self._members) if self._members else ''
         return 'struct %s {%s}' % (self.name, members)
 
 class Function(object):
-    def __init__(self, name, args, body, symboltable):
+    def __init__(self, name, args, body):
         self.name = name
         self.args = args
         self.body = body
-        self.symboltable = SymbolTable(symboltable)
 
-    def typecheck(self, typemap):
+    def populate_symbol_table(self, symboltable):
+        symboltable[self.name] = self
+
+        self.symboltable = SymbolTable(symboltable)
         for a in self.args:
-            a.typecheck(typemap)
+            a.populate_symbol_table(self.symboltable)
+        for b in self.body:
+            b.populate_symbol_table(self.symboltable)
+
+    def dependent_types(self, symboltable):
+        dependencies = []
+        for a in self.args:
+            dependencies += a.dependent_types(symboltable)
+        for b in self.body:
+            dependencies += b.dependent_types(self.symboltable)
+        return [(self, self.args)] + dependencies
+
+    def typecheck(self, symboltable):
+        for a in self.args:
+            a.typecheck(symboltable)
             self.symboltable[a.name] = a
 
         for b in self.body:
             b.typecheck(self.symboltable)
 
         self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
-        typemap[self.name] = self
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self.name)
@@ -234,12 +278,20 @@ class CFunction(object):
         self.name = name
         self.args = args
 
-    def typecheck(self, typemap):
+    def populate_symbol_table(self, symboltable):
+        symboltable[self.name] = self
+
+    def dependent_types(self, symboltable):
+        dependencies = []
         for a in self.args:
-            a.typecheck(typemap)
+            dependencies += a.dependent_types(symboltable)
+        return [(self, self.args)] + dependencies
+
+    def typecheck(self, symboltable):
+        for a in self.args:
+            a.typecheck(symboltable)
 
         self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
-        typemap[self.name] = self
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self.name)

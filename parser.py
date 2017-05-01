@@ -4,10 +4,6 @@ import ply.yacc as yacc
 
 from lexer import tokens
 from ast import *
-from symbols import SymbolTable
-from typemap import builtins
-
-symboltable = builtins();
 
 def p_top_level_list_empty(p):
     'top_level_list : '
@@ -55,7 +51,7 @@ def p_cdecl(p):
 
 def p_function_def(p):
     'function_def : function_decl block'
-    p[0] = Function(p[1][0], p[1][1], p[2], symboltable)
+    p[0] = Function(p[1][0], p[1][1], p[2])
 
 def p_function_decl(p):
     'function_decl : FN identifier function_args'

@@ -15,4 +15,4 @@ build/out.ll: example/basic.ave *.py
 	./compiler.py $< >$@
 
 clean:
-	rm -rf build/*
+	rm -rf build/* parser.out parsetab.py

@@ -7,8 +7,14 @@ class BasicType(object):
         self.name = name
         self.irtype = irtype
 
+    def typecheck(self, symboltable):
+        pass
+
     def emit_type(self):
         return self.irtype
+
+    def __repr__(self):
+        return self.name
 
 Int32Type = BasicType('i32', ir.IntType(32))
 FloatType = BasicType('f32', ir.FloatType())
