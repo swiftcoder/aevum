@@ -84,9 +84,6 @@ class VarRef(AST):
         return [(self, [self.item])]
 
     def emit(self, builder, stack):
-        pass
-
-    def fetch(self, builder, stack):
         self.item.fetch(builder, stack)
 
     def call(self, builder, stack):
@@ -227,7 +224,7 @@ class Struct(AST):
         members = ', '.join(str(s) for s in self._members) if self._members else ''
         return 'struct %s {%s}' % (self.name, members)
 
-class Function(object):
+class Function(AST):
     def __init__(self, name, args, body):
         self.name = name
         self.args = args
@@ -284,7 +281,7 @@ class Function(object):
         body = '; '.join(str(s) for s in self.body) + ';' if self.body else ''
         return 'fn %s(%s) {%s}' % (self.name, args, body)
 
-class CFunction(object):
+class CFunction(AST):
     def __init__(self, name, args):
         self.name = name
         self.args = args
@@ -316,3 +313,44 @@ class CFunction(object):
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
         return 'cdecl fn %s(%s)' % (self.name, args)
+
+class If(AST):
+    def __init__(self, expr, block_then, block_else=[]):
+        self.expr = expr
+        self.block_then = block_then
+        self.block_else = block_else
+
+    def populate_symbol_table(self, symboltable):
+        self.symboltable = SymbolTable(symboltable)
+
+        self.expr.populate_symbol_table(self.symboltable)
+        for b in self.block_then:
+            b.populate_symbol_table(self.symboltable)
+        for b in self.block_else:
+            b.populate_symbol_table(self.symboltable)
+
+    def dependent_types(self, symboltable):
+        dependencies = self.expr.dependent_types(self.symboltable)
+        for b in self.block_then:
+            dependencies += b.dependent_types(self.symboltable)
+        for b in self.block_else:
+            dependencies += b.dependent_types(self.symboltable)
+        return dependencies
+
+    def typecheck(self, symboltable):
+        self.expr.typecheck(self.symboltable)
+        for b in self.block_then:
+            b.typecheck(self.symboltable)
+        for b in self.block_else:
+            b.typecheck(self.symboltable)
+
+    def emit(self, builder, stack):
+        self.expr.emit(builder, stack)
+        predicate = stack.pop()
+        with builder.if_else(predicate) as (then, otherwise):
+            with then:
+                for b in self.block_then:
+                    b.emit(builder, stack)
+            with otherwise:
+                for b in self.block_else:
+                    b.emit(builder, stack)

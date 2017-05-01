@@ -80,22 +80,30 @@ def p_statement_list_empty(p):
     'statement_list : '
     p[0] = []
 def p_statement_list_one(p):
-    'statement_list : statement SEMICOLON'
+    'statement_list : statement'
     p[0] = [p[1]]
 def p_statement_list_rest(p):
-    'statement_list : statement_list statement SEMICOLON'
+    'statement_list : statement_list statement'
     p[0] = p[1]
     p[0].append(p[2])
 
 def p_statement(p):
-    '''statement : let_var
-                 | assignment
-                 | expression'''
+    '''statement : let_var SEMICOLON
+                 | if
+                 | assignment SEMICOLON
+                 | expression SEMICOLON'''
     p[0] = p[1]
 
 def p_let_var(p):
     'let_var : LET var_decl'
     p[0] = p[2]
+
+def p_if(p):
+    'if : IF LPAREN expression RPAREN block'
+    p[0] = If(p[3], p[5])
+def p_if_else(p):
+    'if : IF LPAREN expression RPAREN block ELSE block'
+    p[0] = If(p[3], p[5], p[7])
 
 def p_assignment(p):
     'assignment : expression ASSIGN expression'

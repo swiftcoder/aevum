@@ -10,6 +10,8 @@ reserved = {
     'let': 'LET',
     'true': 'TRUE',
     'false': 'FALSE',
+    'if': 'IF',
+    'else': 'ELSE',
 }
 
 tokens = [

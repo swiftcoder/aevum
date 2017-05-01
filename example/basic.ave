@@ -9,6 +9,11 @@ fn do_things(hello : Hello) {
 }
 
 fn do_nothing(flag : bool) {
+    if (flag) {
+        puts("flag is true");
+    } else {
+        puts("flag is false");
+    }
 }
 
 struct Hello {
@@ -25,7 +30,7 @@ fn main() {
 
     do_things(hello);
 
-    do_nothing(false);
+    do_nothing(true);
 
     puts(hello.greeting);
 
