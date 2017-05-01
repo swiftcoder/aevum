@@ -8,7 +8,7 @@ fn do_things(hello : Hello) {
     puts(hello.greeting);
 }
 
-fn do_nothing() {
+fn do_nothing(flag : bool) {
 }
 
 struct Hello {
@@ -20,12 +20,14 @@ struct Hello {
 // this is a comment
 
 fn main() {
-	let hello : Hello;
+    let hello : Hello;
     hello.greeting = "hello";
 
-	do_things(hello);
+    do_things(hello);
+
+    do_nothing(false);
 
     puts(hello.greeting);
 
-	puts("Hello, \"World\"!");
+    puts("Hello, \"World\"!");
 }

@@ -145,7 +145,8 @@ def p_identifier(p):
 
 def p_literal(p):
     '''literal : numeric
-               | string'''
+               | string
+               | bool'''
     p[0] = p[1]
 
 def p_numeric(p):
@@ -158,6 +159,13 @@ def p_numeric(p):
 def p_string(p):
     'string : STRING'
     p[0] = ConstantString(p[1])
+
+def p_bool_true(p):
+    'bool : TRUE'
+    p[0] = ConstantBool(True)
+def p_bool_false(p):
+    'bool : FALSE'
+    p[0] = ConstantBool(False)
 
 def p_error(p):
     print("Syntax error in input!")

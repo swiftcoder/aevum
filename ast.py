@@ -18,6 +18,17 @@ class AST(object):
     def typecheck(self, symboltable):
         pass
 
+class ConstantBool(AST):
+    def __init__(self, value):
+        self.value = bool(value)
+
+    def emit(self, builder, stack):
+        i = ir.Constant(ir.IntType(1), self.value)
+        stack.append(i)
+
+    def __repr__(self):
+        return 'bool %s' % (self.value)
+
 class ConstantString(AST):
     def __init__(self, data):
         data = data[1:-1]

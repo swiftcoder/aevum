@@ -18,7 +18,7 @@ if __name__ == '__main__':
         s.populate_symbol_table(symboltable)
 
     # gather type dependencies
-    dependencies = [(a, []) for a in [Int32Type, FloatType, StrType]]
+    dependencies = [(a, []) for a in builtin_types()]
     for s in ast:
         dependencies += s.dependent_types(symboltable)
 

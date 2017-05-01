@@ -7,13 +7,15 @@ reserved = {
     'struct': 'STRUCT',
     'fn': 'FN',
     'cdecl': 'CDECL',
-    'let': 'LET'
+    'let': 'LET',
+    'true': 'TRUE',
+    'false': 'FALSE',
 }
 
 tokens = [
     'IDENTIFIER', 'NUMERIC', 'STRING',
     'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE',
-    'SEMICOLON', 'COLON', 'DOT', 'COMMA', 'ASSIGN'
+    'SEMICOLON', 'COLON', 'DOT', 'COMMA', 'ASSIGN',
 ] + list(reserved.values())
 
 t_LPAREN = r'\('
