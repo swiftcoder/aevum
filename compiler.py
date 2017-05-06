@@ -8,8 +8,14 @@ if __name__ == '__main__':
     from typemap import *
     from llvmlite import ir, binding
     from sorting import topological_sort
+    import argparse
 
-    source = Path(sys.argv[1]).read_text()
+    parser = argparse.ArgumentParser(description='Compile Aevum source files')
+    parser.add_argument('-o', dest='output_file', type=str, default='a.out', help='output file')
+    parser.add_argument('intput_file', type=str, nargs='+', help='input files')
+    args = parser.parse_args()
+
+    source = Path(args.intput_file[0]).read_text()
     ast = yacc.parse(source)
 
     # first populate the symbol table
@@ -21,6 +27,8 @@ if __name__ == '__main__':
     dependencies = [(a, []) for a in builtin_types()]
     for s in ast:
         dependencies += s.dependent_types(symboltable)
+
+    print(dependencies)
 
     # sort it by dependency order
     ordered = topological_sort(dependencies)
@@ -37,4 +45,5 @@ if __name__ == '__main__':
     for s in ast:
         s.emit(module)
 
-    print(str(module))
+    with open(args.output_file, 'w') as output_file:
+        output_file.write(str(module))

@@ -5,8 +5,12 @@ from llvmlite import ir
 
 from symbols import *
 from typemap import *
+import names
 
 next_serial = 1
+
+class NoMatchingFunctionSignature(Exception):
+    pass
 
 class AST(object):
     def populate_symbol_table(self, symboltable):
@@ -21,6 +25,7 @@ class AST(object):
 class ConstantBool(AST):
     def __init__(self, value):
         self.value = bool(value)
+        self.type = BoolType
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.IntType(1), self.value)
@@ -33,6 +38,7 @@ class ConstantString(AST):
     def __init__(self, data):
         data = data[1:-1]
         self.data = data.replace('\\\"', '\"') + '\0'
+        self.type = StringType
 
     def emit(self, builder, stack):
         global next_serial
@@ -53,6 +59,7 @@ class ConstantString(AST):
 class ConstantInt(AST):
     def __init__(self, value):
         self.value = int(value)
+        self.type = Int32Type
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.IntType(32), self.value)
@@ -67,6 +74,7 @@ class ConstantFloat(AST):
             self.value = float.fromhex(value)
         else:
             self.value = float(value)
+        self.type = FloatType
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.FloatType(), self.value)
@@ -80,8 +88,23 @@ class VarRef(AST):
         self.name = name
 
     def dependent_types(self, symboltable):
-        self.item = symboltable[self.name]
+        self.item = symboltable.match_one(self.name)
         return [(self, [self.item])]
+
+    def dependent_types_func(self, symboltable):
+        self.items = symboltable.match(self.name)
+        return [(self, self.items)]
+
+    def typecheck(self, symboltable):
+        if hasattr(self, 'item') and hasattr(self.item, 'type'):
+            self.type = self.item.type
+
+    def typecheck_func(self, symboltable, args):
+        for i in self.items:
+            if len(i.args) == len(args) and all(a.type == b for a, b in zip(i.args, args)):
+                self.item = i
+                return
+        raise NoMatchingFunctionSignature(self.name, self.items, [a.type for a in args])
 
     def emit(self, builder, stack):
         self.item.fetch(builder, stack)
@@ -93,7 +116,7 @@ class VarRef(AST):
         return self.item.reference(builder)
 
     def __repr__(self):
-        return 'var %s' % (self.name)
+        return 'varref %s' % (self.name)
 
 class Member(AST):
     def __init__(self, target, name):
@@ -106,7 +129,7 @@ class Member(AST):
 
     def typecheck(self, symboltable):
         self.target.typecheck(symboltable)
-        self.item = self.target.item.type.members[self.name]
+        self.type = self.target.item.type.members[self.name].type
         self.index = list(self.target.item.type.members.keys()).index(self.name)
 
     def emit(self, builder, stack):
@@ -128,15 +151,15 @@ class Call(AST):
         self.args = args
 
     def dependent_types(self, symboltable):
-        dependancies = self.func.dependent_types(symboltable)
+        dependancies = self.func.dependent_types_func(symboltable)
         for a in self.args:
             dependancies += a.dependent_types(symboltable)
-        return [(self, [self.func] + self.args)] + dependancies
+        return [(self, self.args)] + dependancies
 
     def typecheck(self, symboltable):
-        self.func.typecheck(symboltable)
         for a in self.args:
             a.typecheck(symboltable)
+        self.func.typecheck_func(symboltable, [a.type for a in self.args])
 
     def emit(self, builder, stack):
         for a in self.args:
@@ -148,15 +171,15 @@ class Call(AST):
         return '%s(%s)' % (str(self.func), args)
 
 class VarDecl(AST):
-    def __init__(self, name, _type):
+    def __init__(self, name, typename):
         self.name = name
-        self.type = _type
+        self.typename = typename
 
     def populate_symbol_table(self, symboltable):
-        symboltable[self.name] = self
+        symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
-        self.type = symboltable[self.type]
+        self.type = symboltable.match_one(self.typename)
         return [(self, [self.type])]
 
     def emit(self, builder, stack):
@@ -170,7 +193,7 @@ class VarDecl(AST):
         return self.item
 
     def __repr__(self):
-        return '%s : %s' % (self.name, self.type)
+        return '%s : %s' % (self.name, self.typename)
 
 class Assignment(AST):
     def __init__(self, target, value):
@@ -202,7 +225,7 @@ class Struct(AST):
         self.members = {m.name: m for m in self._members}
 
     def populate_symbol_table(self, symboltable):
-        symboltable[self.name] = self
+        symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
         dependencies = []
@@ -231,7 +254,7 @@ class Function(AST):
         self.body = body
 
     def populate_symbol_table(self, symboltable):
-        symboltable[self.name] = self
+        symboltable.put(self.name, self)
 
         self.symboltable = SymbolTable(symboltable)
         for a in self.args:
@@ -250,7 +273,7 @@ class Function(AST):
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
-            self.symboltable[a.name] = a
+            self.symboltable.put(a.name, a)
 
         for b in self.body:
             b.typecheck(self.symboltable)
@@ -258,7 +281,7 @@ class Function(AST):
         self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
 
     def emit(self, module):
-        self.func = ir.Function(module, self.irtype, self.name)
+        self.func = ir.Function(module, self.irtype, self._mangle())
         block = self.func.append_basic_block('entry')
         builder = ir.IRBuilder(block)
         for a, i in zip(self.args, self.func.args):
@@ -276,6 +299,9 @@ class Function(AST):
         del stack[-count:]
         stack.append(builder.call(self.func, args))
 
+    def _mangle(self):
+        return names.mangle(self.name, [a.typename for a in self.args])
+
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
         body = '; '.join(str(s) for s in self.body) + ';' if self.body else ''
@@ -287,7 +313,7 @@ class CFunction(AST):
         self.args = args
 
     def populate_symbol_table(self, symboltable):
-        symboltable[self.name] = self
+        symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
         dependencies = []

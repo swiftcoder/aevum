@@ -12,7 +12,7 @@ build/out.s: build/out.ll
 	 clang -Os -S -o $@ $<
 
 build/out.ll: example/basic.ave *.py
-	./compiler.py $< >$@
+	./compiler.py -o $@ $<
 
 clean:
 	rm -rf build/* parser.out parsetab.py

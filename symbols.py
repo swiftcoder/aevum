@@ -2,19 +2,30 @@
 class SymbolNotFound(Exception):
     pass
 
+class SymbolConflict(Exception):
+    pass
+
 class SymbolTable(object):
     def __init__(self, parent=None):
         self.parent = parent
         self.table = {}
 
-    def __getitem__(self, index):
-        symbol = self.table.get(index) or (self.parent[index] if self.parent else None)
-        if not symbol:
-            raise SymbolNotFound(index)
-        return symbol
+    def put(self, key, item):
+        self.table.setdefault(key, []).append(item)
 
-    def __setitem__(self, index, value):
-        self.table[index] = value
+    def match(self, key):
+        result = self.table.get(key, [])
+        if self.parent:
+            result += self.parent.match(key)
+        return result
+
+    def match_one(self, key):
+        result = self.table.get(key, [])
+        if len(result) > 1:
+            raise SymbolConflict(key)
+        if len(result) == 0 and self.parent:
+            return self.parent.match_one(key)
+        return result[0]
 
     def __str__(self):
         return self.table.__str__()

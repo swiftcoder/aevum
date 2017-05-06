@@ -16,6 +16,9 @@ fn do_nothing(flag : bool) {
     }
 }
 
+fn do_nothing(f : f32) {
+}
+
 struct Hello {
     value : i32,
     next : f32,

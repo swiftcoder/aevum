@@ -19,7 +19,7 @@ class BasicType(object):
 BoolType = BasicType('bool', ir.IntType(1))
 Int32Type = BasicType('i32', ir.IntType(32))
 FloatType = BasicType('f32', ir.FloatType())
-StrType = BasicType('str', ir.IntType(8).as_pointer())
+StringType = BasicType('str', ir.IntType(8).as_pointer())
 
 class StructType(BasicType):
     def __init__(self, name, members, irtype):
@@ -27,10 +27,10 @@ class StructType(BasicType):
         self.members = members
 
 def builtin_types():
-    return [BoolType, Int32Type, FloatType, StrType]
+    return [BoolType, Int32Type, FloatType, StringType]
 
 def builtins():
     symbols = SymbolTable(None)
     for t in builtin_types():
-        symbols[t.name] = t;
+        symbols.put(t.name, t);
     return symbols

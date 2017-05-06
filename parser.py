@@ -40,22 +40,25 @@ def p_struct_body_rest(p):
 def p_var_decl(p):
     'var_decl : identifier COLON type_expr'
     p[0] = VarDecl(p[1], p[3])
+    p[0].lineno = p.lineno(2)
 
 def p_typeexpr(p):
     'type_expr : identifier'
     p[0] = p[1]
 
 def p_cdecl(p):
-    'cdecl : CDECL function_decl SEMICOLON'
-    p[0] = CFunction(*p[2])
+    'cdecl : CDECL FN function_decl SEMICOLON'
+    p[0] = CFunction(p[3][0], p[3][1])
+    p[0].lineno = p.lineno(1)
 
 def p_function_def(p):
-    'function_def : function_decl block'
-    p[0] = Function(p[1][0], p[1][1], p[2])
+    'function_def : FN function_decl block'
+    p[0] = Function(p[2][0], p[2][1], p[3])
+    p[0].lineno = p.lineno(1)
 
 def p_function_decl(p):
-    'function_decl : FN identifier function_args'
-    p[0] = (p[2], p[3])
+    'function_decl : identifier function_args'
+    p[0] = (p[1], p[2])
 
 def p_function_args(p):
     'function_args : LPAREN function_arg_list RPAREN'
@@ -101,9 +104,11 @@ def p_let_var(p):
 def p_if(p):
     'if : IF LPAREN expression RPAREN block'
     p[0] = If(p[3], p[5])
+    p[0].lineno = p.lineno(1)
 def p_if_else(p):
     'if : IF LPAREN expression RPAREN block ELSE block'
     p[0] = If(p[3], p[5], p[7])
+    p[0].lineno = p.lineno(1)
 
 def p_assignment(p):
     'assignment : expression ASSIGN expression'
@@ -123,10 +128,10 @@ def p_expression(p):
     p[0] = p[1]
 
 def p_call_expression_no_args(p):
-    'call_expression : dummy_member_expression LPAREN RPAREN'
+    'call_expression : named_reference LPAREN RPAREN'
     p[0] = Call(p[1], None)
 def p_call_expression(p):
-    'call_expression : dummy_member_expression LPAREN expression_list RPAREN'
+    'call_expression : named_reference LPAREN expression_list RPAREN'
     p[0] = Call(p[1], p[3])
 
 def p_dummy_member_expression(p):
@@ -144,8 +149,9 @@ def p_atom(p):
     p[0] = p[1]
 
 def p_named_reference(p):
-    'named_reference : identifier'
+    'named_reference : IDENTIFIER'
     p[0] = VarRef(p[1])
+    p[0].lineno = p.lineno(1)
 
 def p_identifier(p):
     'identifier : IDENTIFIER'
