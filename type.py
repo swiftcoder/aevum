@@ -10,6 +10,9 @@ class BasicType(object):
     def typecheck(self, symboltable):
         pass
 
+    def typecheck_body(self, symboltable):
+        pass
+
     def emit_type(self):
         return self.irtype
 

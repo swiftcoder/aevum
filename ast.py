@@ -25,6 +25,29 @@ class AST(object):
     def typecheck(self, symboltable):
         pass
 
+    def typecheck_body(self, symboltable):
+        pass
+
+class Type(AST):
+    def __init__(self, name):
+        self.name = name
+
+    def dependent_types(self, symboltable):
+        self.type = symboltable.match_one(self.name)
+        return [(self, [self.type])]
+
+class ArrayType(AST):
+    def __init__(self, inner):
+        self.inner = inner
+        self.name = 'array_of_' + inner.name
+
+    def dependent_types(self, symboltable):
+        return [(self, [self.inner])] + self.inner.dependent_types(symboltable)
+
+    def typecheck(self, symboltable):
+        self.inner.typecheck(symboltable)
+        self.type = type.ArrayType(self.inner.type)
+
 class Void(AST):
     def __init__(self):
         self.type = type.VoidType
@@ -227,21 +250,19 @@ class Call(AST):
         return '%s(%s)' % (str(self.func), args)
 
 class VarDecl(AST):
-    def __init__(self, name, typename):
+    def __init__(self, name, typeexpr):
         self.name = name
-        self.typename = typename
+        self.typeexpr = typeexpr
 
     def populate_symbol_table(self, symboltable):
         symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
-        if isinstance(self.typename, list):
-            innerType = symboltable.match_one(self.typename[0])
-            self.type = type.ArrayType(innerType)
-            self.typename = str(self.type)
-            return [(self, [])]
-        self.type = symboltable.match_one(self.typename)
-        return [(self, [self.type])]
+        return [(self, [self.typeexpr])] + self.typeexpr.dependent_types(symboltable)
+
+    def typecheck(self, symboltable):
+        self.typeexpr.typecheck(symboltable)
+        self.type = self.typeexpr.type
 
     def emit(self, builder, stack):
         self.item = builder.alloca(self.type.irtype)
@@ -254,7 +275,7 @@ class VarDecl(AST):
         return self.item
 
     def __repr__(self):
-        return '%s : %s' % (self.name, self.typename)
+        return '%s : %s' % (self.name, self.typeexpr)
 
 class Assignment(AST):
     def __init__(self, target, value):
@@ -326,23 +347,24 @@ class Function(AST):
             b.populate_symbol_table(self.symboltable)
 
     def dependent_types(self, symboltable):
-        self.result_type = symboltable.match_one(self.result)
         dependencies = []
+        dependencies += self.result.dependent_types(symboltable)
         for a in self.args:
             dependencies += a.dependent_types(symboltable)
         for b in self.body:
             dependencies += b.dependent_types(self.symboltable)
-        return [(self, self.args + [self.result_type])] + dependencies
+        return [(self, self.args + [self.result])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
             self.symboltable.put(a.name, a)
 
+        self.irtype = ir.FunctionType(self.result.type.irtype, (a.type.irtype for a in self.args), False)
+
+    def typecheck_body(self, symboltable):
         for b in self.body:
             b.typecheck(self.symboltable)
-
-        self.irtype = ir.FunctionType(self.result_type.irtype, (a.type.irtype for a in self.args), False)
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self._mangle())
@@ -367,7 +389,7 @@ class Function(AST):
         stack.append(builder.call(self.func, args))
 
     def _mangle(self):
-        return names.mangle(self.name, [a.typename for a in self.args])
+        return names.mangle(self.name, [a.type.name for a in self.args])
 
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
@@ -384,17 +406,17 @@ class CFunction(AST):
         symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
-        self.result_type = symboltable.match_one(self.result)
         dependencies = []
+        dependencies += self.result.dependent_types(symboltable)
         for a in self.args:
             dependencies += a.dependent_types(symboltable)
-        return [(self, self.args + [self.result_type])] + dependencies
+        return [(self, self.args + [self.result])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
 
-        self.irtype = ir.FunctionType(self.result_type.irtype, (a.type.irtype for a in self.args), False)
+        self.irtype = ir.FunctionType(self.result.type.irtype, (a.type.irtype for a in self.args), False)
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self.name)

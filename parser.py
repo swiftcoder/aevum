@@ -44,11 +44,11 @@ def p_var_decl(p):
 
 def p_typeexpr(p):
     'type_expr : identifier'
-    p[0] = p[1]
+    p[0] = ast.Type(p[1])
 
 def p_typeexpr_array(p):
-    'type_expr : LSQUARE identifier RSQUARE'
-    p[0] = [p[2]]
+    'type_expr : LSQUARE type_expr RSQUARE'
+    p[0] = ast.ArrayType(p[2])
 
 def p_cdecl(p):
     'cdecl : CDECL FN function_decl SEMICOLON'
@@ -62,7 +62,7 @@ def p_function_def(p):
 
 def p_function_decl(p):
     'function_decl : identifier function_args'
-    p[0] = (p[1], p[2], 'void')
+    p[0] = (p[1], p[2], ast.Type('void'))
 
 def p_function_decl_return_type(p):
     'function_decl : identifier function_args RARROW type_expr'

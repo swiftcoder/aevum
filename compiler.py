@@ -35,6 +35,9 @@ if __name__ == '__main__':
     for t in ordered:
         t.typecheck(symboltable)
 
+    for t in ordered:
+        t.typecheck_body(symboltable)
+
     #print('\n' + '\n\n'.join(str(s) for s in ast))
 
     module = ir.Module(name="main")
