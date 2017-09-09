@@ -298,7 +298,8 @@ class Struct(AST):
         for m in self._members:
             m.typecheck(symboltable)
 
-        self.irtype = ir.LiteralStructType(m.type.irtype for m in self._members)
+        self.irtype = ir.context.global_context.get_identified_type(self.name)
+        self.irtype.set_body(*[m.type.irtype for m in self._members])
         self.type = StructType(self.name, {m.name: m.type for m in self._members}, self.irtype)
 
     def emit(self, module):
