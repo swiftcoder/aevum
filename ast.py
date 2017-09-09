@@ -16,11 +16,35 @@ class NotAllArrayMembersOfSameType(Exception):
     pass
 
 class AST(object):
+    def __init__(self, **args):
+        self._dependencies = args.get('dependencies', [])
+        self._function_dependencies = args.get('function_dependencies', [])
+        self._internal_dependencies = args.get('internal_dependencies', [])
+        self._has_symbol_table = args.get('has_symbol_table', False)
+        self._symbols = args.get('symbols', [])
+        self._populate_symbols = args.get('populate_symbols', [])
+
     def populate_symbol_table(self, symboltable):
-        pass
+        for name, symbol in self._symbols:
+            symboltable.put(self.name, symbol)
+
+        if self._has_symbol_table:
+            symboltable = SymbolTable(symboltable)
+            self.symboltable = symboltable
+
+        for p in self._populate_symbols:
+            p.populate_symbol_table(symboltable)
 
     def dependent_types(self, symboltable):
-        return [(self, [])]
+        deps = []
+        for f in self._function_dependencies:
+            deps += f.dependent_types_func(symboltable)
+        for d in self._dependencies:
+            deps += d.dependent_types(symboltable)
+        if self._has_symbol_table:
+            for i in self._internal_dependencies:
+                deps += i.dependent_types(self.symboltable)
+        return [(self, self._dependencies)] + deps
 
     def typecheck(self, symboltable):
         pass
@@ -28,8 +52,12 @@ class AST(object):
     def typecheck_body(self, symboltable):
         pass
 
+    def emit(self, module):
+        pass
+
 class Type(AST):
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     def dependent_types(self, symboltable):
@@ -38,11 +66,9 @@ class Type(AST):
 
 class ArrayType(AST):
     def __init__(self, inner):
+        super().__init__(dependencies=[inner])
         self.inner = inner
         self.name = 'array_of_' + inner.name
-
-    def dependent_types(self, symboltable):
-        return [(self, [self.inner])] + self.inner.dependent_types(symboltable)
 
     def typecheck(self, symboltable):
         self.inner.typecheck(symboltable)
@@ -50,10 +76,12 @@ class ArrayType(AST):
 
 class Void(AST):
     def __init__(self):
+        super().__init__()
         self.type = type.VoidType
 
 class ConstantBool(AST):
     def __init__(self, value):
+        super().__init__()
         self.value = bool(value)
         self.type = type.BoolType
 
@@ -66,6 +94,7 @@ class ConstantBool(AST):
 
 class ConstantString(AST):
     def __init__(self, data):
+        super().__init__()
         data = data[1:-1]
         self.data = data.replace('\\\"', '\"') + '\0'
         self.type = type.StringType
@@ -88,14 +117,9 @@ class ConstantString(AST):
 
 class ConstantArray(AST):
     def __init__(self, elements):
+        super().__init__(dependencies=elements)
         self.elements = elements
         self.type = None
-
-    def dependent_types(self, symboltable):
-        dependencies = []
-        for e in self.elements:
-            dependencies += e.dependent_types(symboltable)
-        return [(self, self.elements)] + dependencies
 
     def typecheck(self, symboltable):
         if len(self.elements) > 0:
@@ -137,6 +161,7 @@ class ConstantArray(AST):
 
 class ConstantInt(AST):
     def __init__(self, value):
+        super().__init__()
         self.value = int(value)
         self.type = type.Int32Type
 
@@ -149,6 +174,7 @@ class ConstantInt(AST):
 
 class ConstantFloat(AST):
     def __init__(self, value):
+        super().__init__()
         if value.startswith('0x') or value.startswith('0X'):
             self.value = float.fromhex(value)
         else:
@@ -164,6 +190,7 @@ class ConstantFloat(AST):
 
 class VarRef(AST):
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     def dependent_types(self, symboltable):
@@ -199,12 +226,9 @@ class VarRef(AST):
 
 class Member(AST):
     def __init__(self, target, name):
+        super().__init__(dependencies=[target])
         self.target = target
         self.name = name
-
-    def dependent_types(self, symboltable):
-        target_deps = self.target.dependent_types(symboltable)
-        return [(self, [self.target])] + target_deps
 
     def typecheck(self, symboltable):
         self.target.typecheck(symboltable)
@@ -226,14 +250,9 @@ class Member(AST):
 
 class Call(AST):
     def __init__(self, func, args):
+        super().__init__(dependencies=args, function_dependencies=[func])
         self.func = func
         self.args = args
-
-    def dependent_types(self, symboltable):
-        dependancies = self.func.dependent_types_func(symboltable)
-        for a in self.args:
-            dependancies += a.dependent_types(symboltable)
-        return [(self, self.args)] + dependancies
 
     def typecheck(self, symboltable):
         for a in self.args:
@@ -251,14 +270,9 @@ class Call(AST):
 
 class VarDecl(AST):
     def __init__(self, name, typeexpr):
+        super().__init__(dependencies=[typeexpr], symbols=[(name, self)])
         self.name = name
         self.typeexpr = typeexpr
-
-    def populate_symbol_table(self, symboltable):
-        symboltable.put(self.name, self)
-
-    def dependent_types(self, symboltable):
-        return [(self, [self.typeexpr])] + self.typeexpr.dependent_types(symboltable)
 
     def typecheck(self, symboltable):
         self.typeexpr.typecheck(symboltable)
@@ -279,13 +293,9 @@ class VarDecl(AST):
 
 class Assignment(AST):
     def __init__(self, target, value):
+        super().__init__(dependencies=[target, value])
         self.target = target
         self.value = value
-
-    def dependent_types(self, symboltable):
-        dependencies = self.target.dependent_types(symboltable)
-        dependencies += self.value.dependent_types(symboltable)
-        return [(self, [self.target, self.value])] + dependencies
 
     def typecheck(self, symboltable):
         self.target.typecheck(symboltable)
@@ -302,18 +312,10 @@ class Assignment(AST):
 
 class Struct(AST):
     def __init__(self, name, members):
+        super().__init__(dependencies=members, symbols=[(name, self)])
         self.name = name
         self._members = members
         self.members = {m.name: m for m in self._members}
-
-    def populate_symbol_table(self, symboltable):
-        symboltable.put(self.name, self)
-
-    def dependent_types(self, symboltable):
-        dependencies = []
-        for m in self._members:
-            dependencies += m.dependent_types(symboltable)
-        return [(self, self._members)] + dependencies
 
     def typecheck(self, symboltable):
         for m in self._members:
@@ -323,37 +325,17 @@ class Struct(AST):
         self.irtype.set_body(*[m.type.irtype for m in self._members])
         self.type = type.StructType(self.name, {m.name: m.type for m in self._members}, self.irtype)
 
-    def emit(self, module):
-        pass
-
     def __repr__(self):
         members = ', '.join(str(s) for s in self._members) if self._members else ''
         return 'struct %s {%s}' % (self.name, members)
 
 class Function(AST):
     def __init__(self, name, args, result, body):
+        super().__init__(dependencies=[result] + args, internal_dependencies=body, has_symbol_table=True, symbols=[(name, self)], populate_symbols=args + body)
         self.name = name
         self.args = args
         self.body = body
         self.result = result
-
-    def populate_symbol_table(self, symboltable):
-        symboltable.put(self.name, self)
-
-        self.symboltable = SymbolTable(symboltable)
-        for a in self.args:
-            a.populate_symbol_table(self.symboltable)
-        for b in self.body:
-            b.populate_symbol_table(self.symboltable)
-
-    def dependent_types(self, symboltable):
-        dependencies = []
-        dependencies += self.result.dependent_types(symboltable)
-        for a in self.args:
-            dependencies += a.dependent_types(symboltable)
-        for b in self.body:
-            dependencies += b.dependent_types(self.symboltable)
-        return [(self, self.args + [self.result])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
@@ -398,19 +380,10 @@ class Function(AST):
 
 class CFunction(AST):
     def __init__(self, name, args, result):
+        super().__init__(dependencies=[result] + args, symbols=[(name, self)])
         self.name = name
         self.args = args
         self.result = result
-
-    def populate_symbol_table(self, symboltable):
-        symboltable.put(self.name, self)
-
-    def dependent_types(self, symboltable):
-        dependencies = []
-        dependencies += self.result.dependent_types(symboltable)
-        for a in self.args:
-            dependencies += a.dependent_types(symboltable)
-        return [(self, self.args + [self.result])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
@@ -436,26 +409,10 @@ class CFunction(AST):
 
 class If(AST):
     def __init__(self, expr, block_then, block_else=[]):
+        super().__init__(dependencies=[expr], internal_dependencies=block_then + block_else, has_symbol_table=True, populate_symbols=[expr] + block_then + block_else)
         self.expr = expr
         self.block_then = block_then
         self.block_else = block_else
-
-    def populate_symbol_table(self, symboltable):
-        self.symboltable = SymbolTable(symboltable)
-
-        self.expr.populate_symbol_table(self.symboltable)
-        for b in self.block_then:
-            b.populate_symbol_table(self.symboltable)
-        for b in self.block_else:
-            b.populate_symbol_table(self.symboltable)
-
-    def dependent_types(self, symboltable):
-        dependencies = self.expr.dependent_types(self.symboltable)
-        for b in self.block_then:
-            dependencies += b.dependent_types(self.symboltable)
-        for b in self.block_else:
-            dependencies += b.dependent_types(self.symboltable)
-        return dependencies
 
     def typecheck(self, symboltable):
         self.expr.typecheck(self.symboltable)
