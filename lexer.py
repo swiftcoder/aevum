@@ -17,7 +17,7 @@ reserved = {
 tokens = [
     'IDENTIFIER', 'NUMERIC', 'STRING',
     'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LSQUARE', 'RSQUARE',
-    'SEMICOLON', 'COLON', 'DOT', 'COMMA', 'ASSIGN',
+    'SEMICOLON', 'COLON', 'DOT', 'COMMA', 'ASSIGN', 'RARROW'
 ] + list(reserved.values())
 
 t_LPAREN = r'\('
@@ -31,6 +31,7 @@ t_COLON = r':'
 t_DOT = r'\.'
 t_COMMA = r','
 t_ASSIGN = r'='
+t_RARROW = r'->'
 
 def t_IDENTIFIER(t):
     r'[^\W0-9]\w*'

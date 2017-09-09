@@ -25,6 +25,10 @@ class AST(object):
     def typecheck(self, symboltable):
         pass
 
+class Void(AST):
+    def __init__(self):
+        self.type = VoidType
+
 class ConstantBool(AST):
     def __init__(self, value):
         self.value = bool(value)
@@ -305,10 +309,11 @@ class Struct(AST):
         return 'struct %s {%s}' % (self.name, members)
 
 class Function(AST):
-    def __init__(self, name, args, body):
+    def __init__(self, name, args, result, body):
         self.name = name
         self.args = args
         self.body = body
+        self.result = result
 
     def populate_symbol_table(self, symboltable):
         symboltable.put(self.name, self)
@@ -320,12 +325,13 @@ class Function(AST):
             b.populate_symbol_table(self.symboltable)
 
     def dependent_types(self, symboltable):
+        self.result_type = symboltable.match_one(self.result)
         dependencies = []
         for a in self.args:
             dependencies += a.dependent_types(symboltable)
         for b in self.body:
             dependencies += b.dependent_types(self.symboltable)
-        return [(self, self.args)] + dependencies
+        return [(self, self.args + [self.result_type])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
@@ -335,7 +341,7 @@ class Function(AST):
         for b in self.body:
             b.typecheck(self.symboltable)
 
-        self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
+        self.irtype = ir.FunctionType(self.result_type.irtype, (a.type.irtype for a in self.args), False)
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self._mangle())
@@ -352,8 +358,11 @@ class Function(AST):
 
     def call(self, builder, stack):
         count = len(self.func.args)
-        args = stack[-count:]
-        del stack[-count:]
+        if count > 0:
+            args = stack[-count:]
+            del stack[-count:]
+        else:
+            args = []
         stack.append(builder.call(self.func, args))
 
     def _mangle(self):
@@ -365,32 +374,37 @@ class Function(AST):
         return 'fn %s(%s) {%s}' % (self.name, args, body)
 
 class CFunction(AST):
-    def __init__(self, name, args):
+    def __init__(self, name, args, result):
         self.name = name
         self.args = args
+        self.result = result
 
     def populate_symbol_table(self, symboltable):
         symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
+        self.result_type = symboltable.match_one(self.result)
         dependencies = []
         for a in self.args:
             dependencies += a.dependent_types(symboltable)
-        return [(self, self.args)] + dependencies
+        return [(self, self.args + [self.result_type])] + dependencies
 
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
 
-        self.irtype = ir.FunctionType(ir.VoidType(), (a.type.irtype for a in self.args), False)
+        self.irtype = ir.FunctionType(self.result_type.irtype, (a.type.irtype for a in self.args), False)
 
     def emit(self, module):
         self.func = ir.Function(module, self.irtype, self.name)
 
     def call(self, builder, stack):
         count = len(self.func.args)
-        args = stack[-count:]
-        del stack[-count:]
+        if count > 0:
+            args = stack[-count:]
+            del stack[-count:]
+        else:
+            args = []
         stack.append(builder.call(self.func, args))
 
     def __repr__(self):

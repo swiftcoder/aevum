@@ -1,6 +1,9 @@
 
 cdecl fn puts(arg : str);
 
+cdecl fn getchar() -> i32;
+cdecl fn putchar(c : i32);
+
 fn puts(args : [i32]) {
     puts("puts array here");
 }
@@ -29,6 +32,12 @@ struct Hello {
     greeting : str
 }
 
+fn read_input() {
+    let c : i32;
+    c = getchar();
+    putchar(c);
+}
+
 // this is a comment
 
 fn main() {
@@ -44,4 +53,6 @@ fn main() {
     puts(hello.greeting);
 
     puts("Hello, \"World\"!");
+
+    read_input();
 }

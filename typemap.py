@@ -24,7 +24,9 @@ class BasicType(object):
     def __repr__(self):
         return self.name
 
+VoidType = BasicType('void', ir.VoidType())
 BoolType = BasicType('bool', ir.IntType(1))
+Int8Type = BasicType('i8', ir.IntType(8))
 Int32Type = BasicType('i32', ir.IntType(32))
 FloatType = BasicType('f32', ir.FloatType())
 StringType = BasicType('str', ir.IntType(8).as_pointer())
@@ -43,7 +45,7 @@ class ArrayType(BasicType):
         self.innerType = innerType
 
 def builtin_types():
-    return [BoolType, Int32Type, FloatType, StringType]
+    return [VoidType, BoolType, Int8Type, Int32Type, FloatType, StringType]
 
 def builtins():
     symbols = SymbolTable(None)

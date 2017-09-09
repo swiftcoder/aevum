@@ -52,17 +52,21 @@ def p_typeexpr_array(p):
 
 def p_cdecl(p):
     'cdecl : CDECL FN function_decl SEMICOLON'
-    p[0] = CFunction(p[3][0], p[3][1])
+    p[0] = CFunction(p[3][0], p[3][1], p[3][2])
     p[0].lineno = p.lineno(1)
 
 def p_function_def(p):
     'function_def : FN function_decl block'
-    p[0] = Function(p[2][0], p[2][1], p[3])
+    p[0] = Function(p[2][0], p[2][1], p[2][2], p[3])
     p[0].lineno = p.lineno(1)
 
 def p_function_decl(p):
     'function_decl : identifier function_args'
-    p[0] = (p[1], p[2])
+    p[0] = (p[1], p[2], 'void')
+
+def p_function_decl_return_type(p):
+    'function_decl : identifier function_args RARROW type_expr'
+    p[0] = (p[1], p[2], p[4])
 
 def p_function_args(p):
     'function_args : LPAREN function_arg_list RPAREN'
@@ -133,7 +137,7 @@ def p_expression(p):
 
 def p_call_expression_no_args(p):
     'call_expression : named_reference LPAREN RPAREN'
-    p[0] = Call(p[1], None)
+    p[0] = Call(p[1], [])
 def p_call_expression(p):
     'call_expression : named_reference LPAREN expression_list RPAREN'
     p[0] = Call(p[1], p[3])
