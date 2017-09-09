@@ -13,6 +13,14 @@ class BasicType(object):
     def emit_type(self):
         return self.irtype
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __hash__(self):
+        return hash(tuple(sorted(self.__dict__.items())))
+
     def __repr__(self):
         return self.name
 
@@ -25,6 +33,14 @@ class StructType(BasicType):
     def __init__(self, name, members, irtype):
         super().__init__(name, irtype)
         self.members = members
+
+class ArrayType(BasicType):
+    def __init__(self, innerType):
+        name = 'array_of_' + str(innerType)
+        irtype = ir.LiteralStructType([ir.IntType(32), innerType.irtype.as_pointer()])
+
+        super().__init__(name, irtype)
+        self.innerType = innerType
 
 def builtin_types():
     return [BoolType, Int32Type, FloatType, StringType]

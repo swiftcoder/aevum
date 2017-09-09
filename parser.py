@@ -46,6 +46,10 @@ def p_typeexpr(p):
     'type_expr : identifier'
     p[0] = p[1]
 
+def p_typeexpr_array(p):
+    'type_expr : LSQUARE identifier RSQUARE'
+    p[0] = [p[2]]
+
 def p_cdecl(p):
     'cdecl : CDECL FN function_decl SEMICOLON'
     p[0] = CFunction(p[3][0], p[3][1])
@@ -120,7 +124,7 @@ def p_expression_list_one(p):
 def p_expression_list_rest(p):
     'expression_list : expression_list COMMA expression'
     p[0] = p[1]
-    p[0].append(p[2])
+    p[0].append(p[3])
 
 def p_expression(p):
     '''expression : call_expression
@@ -160,8 +164,17 @@ def p_identifier(p):
 def p_literal(p):
     '''literal : numeric
                | string
-               | bool'''
+               | bool
+               | array'''
     p[0] = p[1]
+
+def p_array_empty(p):
+    'array : LSQUARE RSQUARE'
+    p[0] = ConstantArray([])
+
+def p_array(p):
+    'array : LSQUARE expression_list RSQUARE'
+    p[0] = ConstantArray(p[2])
 
 def p_numeric(p):
     'numeric : NUMERIC'

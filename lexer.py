@@ -16,7 +16,7 @@ reserved = {
 
 tokens = [
     'IDENTIFIER', 'NUMERIC', 'STRING',
-    'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE',
+    'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LSQUARE', 'RSQUARE',
     'SEMICOLON', 'COLON', 'DOT', 'COMMA', 'ASSIGN',
 ] + list(reserved.values())
 
@@ -24,6 +24,8 @@ t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_LBRACE = r'\{'
 t_RBRACE = r'\}'
+t_LSQUARE = r'\['
+t_RSQUARE = r'\]'
 t_SEMICOLON = r';'
 t_COLON = r':'
 t_DOT = r'\.'

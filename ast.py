@@ -12,6 +12,9 @@ next_serial = 1
 class NoMatchingFunctionSignature(Exception):
     pass
 
+class NotAllArrayMembersOfSameType(Exception):
+    pass
+
 class AST(object):
     def populate_symbol_table(self, symboltable):
         pass
@@ -55,6 +58,55 @@ class ConstantString(AST):
 
     def __repr__(self):
         return 'string "%s"' % (self.data)
+
+class ConstantArray(AST):
+    def __init__(self, elements):
+        self.elements = elements
+        self.type = None
+
+    def dependent_types(self, symboltable):
+        dependencies = []
+        for e in self.elements:
+            dependencies += e.dependent_types(symboltable)
+        return [(self, self.elements)] + dependencies
+
+    def typecheck(self, symboltable):
+        if len(self.elements) > 0:
+            self.innerType = self.elements[0].type
+            for e in self.elements:
+                if e.type != self.innerType:
+                    raise NotAllArrayMembersOfSameType()
+            self.type = ArrayType(self.innerType)
+
+    def emit(self, builder, stack):
+        global next_serial
+        aname = 'array_inner_constant_%d' % (next_serial)
+        name = 'array_constant_%d' % (next_serial)
+        next_serial += 1
+
+        for e in self.elements:
+            e.emit(builder, stack)
+
+        count = len(self.elements)
+        elements = stack[-count:]
+        del stack[-count:]
+
+        ta = ir.ArrayType(self.innerType.irtype, count)
+        globa = ir.GlobalVariable(builder.module, ta, name=aname)
+        globa.global_constant = True
+        globa.initializer = ir.Constant(ta, elements)
+        z = ir.Constant(ir.IntType(32), 0)
+        ga = globa.gep([z, z])
+
+        c = ir.Constant(ir.IntType(32), count)
+
+        glob = ir.GlobalVariable(builder.module, self.type.irtype, name=name)
+        glob.global_constant = True
+        glob.initializer = ir.Constant.literal_struct([c, ga])
+        stack.append(builder.load(glob))
+
+    def __repr__(self):
+        return 'array [%s]' % (', '.join(str(e) for e in self.elements))
 
 class ConstantInt(AST):
     def __init__(self, value):
@@ -104,7 +156,7 @@ class VarRef(AST):
             if len(i.args) == len(args) and all(a.type == b for a, b in zip(i.args, args)):
                 self.item = i
                 return
-        raise NoMatchingFunctionSignature(self.name, self.items, [a.type for a in args])
+        raise NoMatchingFunctionSignature(self.name, self.items, args)
 
     def emit(self, builder, stack):
         self.item.fetch(builder, stack)
@@ -179,6 +231,11 @@ class VarDecl(AST):
         symboltable.put(self.name, self)
 
     def dependent_types(self, symboltable):
+        if isinstance(self.typename, list):
+            innerType = symboltable.match_one(self.typename[0])
+            self.type = ArrayType(innerType)
+            self.typename = str(self.type)
+            return [(self, [])]
         self.type = symboltable.match_one(self.typename)
         return [(self, [self.type])]
 

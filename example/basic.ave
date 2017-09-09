@@ -1,6 +1,10 @@
 
 cdecl fn puts(arg : str);
 
+fn puts(args : [i32]) {
+    puts("puts array here");
+}
+
 fn do_things(hello : Hello) {
     hello.value = 5;
     hello.next = 0x2f.7e32;
@@ -30,6 +34,8 @@ struct Hello {
 fn main() {
     let hello : Hello;
     hello.greeting = "hello";
+
+    puts([1, 2, 3]);
 
     do_things(hello);
 

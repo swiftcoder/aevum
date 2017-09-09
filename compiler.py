@@ -28,8 +28,6 @@ if __name__ == '__main__':
     for s in ast:
         dependencies += s.dependent_types(symboltable)
 
-    print(dependencies)
-
     # sort it by dependency order
     ordered = topological_sort(dependencies)
 
