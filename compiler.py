@@ -5,7 +5,7 @@ if __name__ == '__main__':
     from pathlib import Path
     from parser import yacc
     from ast import Struct
-    from typemap import *
+    import type
     from llvmlite import ir, binding
     from sorting import topological_sort
     import argparse
@@ -19,12 +19,12 @@ if __name__ == '__main__':
     ast = yacc.parse(source)
 
     # first populate the symbol table
-    symboltable = builtins();
+    symboltable = type.builtins();
     for s in ast:
         s.populate_symbol_table(symboltable)
 
     # gather type dependencies
-    dependencies = [(a, []) for a in builtin_types()]
+    dependencies = [(a, []) for a in type.builtin_types()]
     for s in ast:
         dependencies += s.dependent_types(symboltable)
 

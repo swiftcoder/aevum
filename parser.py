@@ -3,7 +3,7 @@
 import ply.yacc as yacc
 
 from lexer import tokens
-from ast import *
+import ast
 
 def p_top_level_list_empty(p):
     'top_level_list : '
@@ -24,7 +24,7 @@ def p_top_level_item(p):
 
 def p_struct_def(p):
     'struct_def : STRUCT identifier LBRACE struct_body RBRACE'
-    p[0] = Struct(p[2], p[4])
+    p[0] = ast.Struct(p[2], p[4])
 
 def p_struct_body_empty(p):
     'struct_body : '
@@ -39,7 +39,7 @@ def p_struct_body_rest(p):
 
 def p_var_decl(p):
     'var_decl : identifier COLON type_expr'
-    p[0] = VarDecl(p[1], p[3])
+    p[0] = ast.VarDecl(p[1], p[3])
     p[0].lineno = p.lineno(2)
 
 def p_typeexpr(p):
@@ -52,12 +52,12 @@ def p_typeexpr_array(p):
 
 def p_cdecl(p):
     'cdecl : CDECL FN function_decl SEMICOLON'
-    p[0] = CFunction(p[3][0], p[3][1], p[3][2])
+    p[0] = ast.CFunction(p[3][0], p[3][1], p[3][2])
     p[0].lineno = p.lineno(1)
 
 def p_function_def(p):
     'function_def : FN function_decl block'
-    p[0] = Function(p[2][0], p[2][1], p[2][2], p[3])
+    p[0] = ast.Function(p[2][0], p[2][1], p[2][2], p[3])
     p[0].lineno = p.lineno(1)
 
 def p_function_decl(p):
@@ -111,16 +111,16 @@ def p_let_var(p):
 
 def p_if(p):
     'if : IF LPAREN expression RPAREN block'
-    p[0] = If(p[3], p[5])
+    p[0] = ast.If(p[3], p[5])
     p[0].lineno = p.lineno(1)
 def p_if_else(p):
     'if : IF LPAREN expression RPAREN block ELSE block'
-    p[0] = If(p[3], p[5], p[7])
+    p[0] = ast.If(p[3], p[5], p[7])
     p[0].lineno = p.lineno(1)
 
 def p_assignment(p):
     'assignment : expression ASSIGN expression'
-    p[0] = Assignment(p[1], p[3])
+    p[0] = ast.Assignment(p[1], p[3])
 
 def p_expression_list_one(p):
     'expression_list : expression'
@@ -137,10 +137,10 @@ def p_expression(p):
 
 def p_call_expression_no_args(p):
     'call_expression : named_reference LPAREN RPAREN'
-    p[0] = Call(p[1], [])
+    p[0] = ast.Call(p[1], [])
 def p_call_expression(p):
     'call_expression : named_reference LPAREN expression_list RPAREN'
-    p[0] = Call(p[1], p[3])
+    p[0] = ast.Call(p[1], p[3])
 
 def p_dummy_member_expression(p):
     '''dummy_member_expression : member_expression
@@ -149,7 +149,7 @@ def p_dummy_member_expression(p):
 
 def p_member_expression(p):
     'member_expression : atom DOT identifier'
-    p[0] = Member(p[1], p[3])
+    p[0] = ast.Member(p[1], p[3])
 
 def p_atom(p):
     '''atom : named_reference
@@ -158,7 +158,7 @@ def p_atom(p):
 
 def p_named_reference(p):
     'named_reference : IDENTIFIER'
-    p[0] = VarRef(p[1])
+    p[0] = ast.VarRef(p[1])
     p[0].lineno = p.lineno(1)
 
 def p_identifier(p):
@@ -174,29 +174,29 @@ def p_literal(p):
 
 def p_array_empty(p):
     'array : LSQUARE RSQUARE'
-    p[0] = ConstantArray([])
+    p[0] = ast.ConstantArray([])
 
 def p_array(p):
     'array : LSQUARE expression_list RSQUARE'
-    p[0] = ConstantArray(p[2])
+    p[0] = ast.ConstantArray(p[2])
 
 def p_numeric(p):
     'numeric : NUMERIC'
     if any(c in p[1] for c in ['.', 'e']):
-        p[0] = ConstantFloat(p[1])
+        p[0] = ast.ConstantFloat(p[1])
     else:
-        p[0] = ConstantInt(p[1])
+        p[0] = ast.ConstantInt(p[1])
 
 def p_string(p):
     'string : STRING'
-    p[0] = ConstantString(p[1])
+    p[0] = ast.ConstantString(p[1])
 
 def p_bool_true(p):
     'bool : TRUE'
-    p[0] = ConstantBool(True)
+    p[0] = ast.ConstantBool(True)
 def p_bool_false(p):
     'bool : FALSE'
-    p[0] = ConstantBool(False)
+    p[0] = ast.ConstantBool(False)
 
 def p_error(p):
     print("Syntax error in input!")

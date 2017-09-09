@@ -4,7 +4,7 @@ import sys
 from llvmlite import ir
 
 from symbols import *
-from typemap import *
+import type
 import names
 
 next_serial = 1
@@ -27,12 +27,12 @@ class AST(object):
 
 class Void(AST):
     def __init__(self):
-        self.type = VoidType
+        self.type = type.VoidType
 
 class ConstantBool(AST):
     def __init__(self, value):
         self.value = bool(value)
-        self.type = BoolType
+        self.type = type.BoolType
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.IntType(1), self.value)
@@ -45,7 +45,7 @@ class ConstantString(AST):
     def __init__(self, data):
         data = data[1:-1]
         self.data = data.replace('\\\"', '\"') + '\0'
-        self.type = StringType
+        self.type = type.StringType
 
     def emit(self, builder, stack):
         global next_serial
@@ -80,7 +80,7 @@ class ConstantArray(AST):
             for e in self.elements:
                 if e.type != self.innerType:
                     raise NotAllArrayMembersOfSameType()
-            self.type = ArrayType(self.innerType)
+            self.type = type.ArrayType(self.innerType)
 
     def emit(self, builder, stack):
         global next_serial
@@ -115,7 +115,7 @@ class ConstantArray(AST):
 class ConstantInt(AST):
     def __init__(self, value):
         self.value = int(value)
-        self.type = Int32Type
+        self.type = type.Int32Type
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.IntType(32), self.value)
@@ -130,7 +130,7 @@ class ConstantFloat(AST):
             self.value = float.fromhex(value)
         else:
             self.value = float(value)
-        self.type = FloatType
+        self.type = type.FloatType
 
     def emit(self, builder, stack):
         i = ir.Constant(ir.FloatType(), self.value)
@@ -237,7 +237,7 @@ class VarDecl(AST):
     def dependent_types(self, symboltable):
         if isinstance(self.typename, list):
             innerType = symboltable.match_one(self.typename[0])
-            self.type = ArrayType(innerType)
+            self.type = type.ArrayType(innerType)
             self.typename = str(self.type)
             return [(self, [])]
         self.type = symboltable.match_one(self.typename)
@@ -300,7 +300,7 @@ class Struct(AST):
 
         self.irtype = ir.context.global_context.get_identified_type(self.name)
         self.irtype.set_body(*[m.type.irtype for m in self._members])
-        self.type = StructType(self.name, {m.name: m.type for m in self._members}, self.irtype)
+        self.type = type.StructType(self.name, {m.name: m.type for m in self._members}, self.irtype)
 
     def emit(self, module):
         pass
