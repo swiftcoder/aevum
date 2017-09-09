@@ -18,11 +18,12 @@ class NotAllArrayMembersOfSameType(Exception):
 class AST(object):
     def __init__(self, **args):
         self._dependencies = args.get('dependencies', [])
-        self._function_dependencies = args.get('function_dependencies', [])
         self._internal_dependencies = args.get('internal_dependencies', [])
         self._has_symbol_table = args.get('has_symbol_table', False)
         self._symbols = args.get('symbols', [])
         self._populate_symbols = args.get('populate_symbols', [])
+        self._lookup_one = args.get('lookup_one', [])
+        self._lookup_many = args.get('lookup_many', [])
 
     def populate_symbol_table(self, symboltable):
         for name, symbol in self._symbols:
@@ -37,14 +38,21 @@ class AST(object):
 
     def dependent_types(self, symboltable):
         deps = []
-        for f in self._function_dependencies:
-            deps += f.dependent_types_func(symboltable)
+        direct = []
         for d in self._dependencies:
             deps += d.dependent_types(symboltable)
         if self._has_symbol_table:
             for i in self._internal_dependencies:
                 deps += i.dependent_types(self.symboltable)
-        return [(self, self._dependencies)] + deps
+        for field, name in self._lookup_one:
+            item = symboltable.match_one(name)
+            setattr(self, field, item)
+            direct += [item]
+        for field, name in self._lookup_many:
+            items = symboltable.match(name)
+            setattr(self, field, items)
+            direct += items
+        return [(self, self._dependencies + direct)] + deps
 
     def typecheck(self, symboltable):
         pass
@@ -57,12 +65,8 @@ class AST(object):
 
 class Type(AST):
     def __init__(self, name):
-        super().__init__()
+        super().__init__(lookup_one=[('type', name)])
         self.name = name
-
-    def dependent_types(self, symboltable):
-        self.type = symboltable.match_one(self.name)
-        return [(self, [self.type])]
 
 class ArrayType(AST):
     def __init__(self, inner):
@@ -190,39 +194,44 @@ class ConstantFloat(AST):
 
 class VarRef(AST):
     def __init__(self, name):
-        super().__init__()
+        super().__init__(lookup_one=[('item', name)])
         self.name = name
-
-    def dependent_types(self, symboltable):
-        self.item = symboltable.match_one(self.name)
-        return [(self, [self.item])]
-
-    def dependent_types_func(self, symboltable):
-        self.items = symboltable.match(self.name)
-        return [(self, self.items)]
 
     def typecheck(self, symboltable):
         if hasattr(self, 'item') and hasattr(self.item, 'type'):
             self.type = self.item.type
 
-    def typecheck_func(self, symboltable, args):
+    def emit(self, builder, stack):
+        self.item.fetch(builder, stack)
+
+    def reference(self, builder):
+        return self.item.reference(builder)
+
+    def as_function_ref(self, args):
+        return FunctionRef(self.name, args)
+
+    def __repr__(self):
+        return 'varref %s' % (self.name)
+
+class FunctionRef(AST):
+    def __init__(self, name, args):
+        super().__init__(dependencies=args, lookup_many=[('items', name)])
+        self.name = name
+        self.args = args
+
+    def typecheck(self, symboltable):
+        args = [a.type for a in self.args]
         for i in self.items:
             if len(i.args) == len(args) and all(a.type == b for a, b in zip(i.args, args)):
                 self.item = i
                 return
-        raise NoMatchingFunctionSignature(self.name, self.items, args)
+        raise NoMatchingFunctionSignature(self.name, self.items, self.args)
 
     def emit(self, builder, stack):
         self.item.fetch(builder, stack)
 
     def call(self, builder, stack):
         self.item.call(builder, stack)
-
-    def reference(self, builder):
-        return self.item.reference(builder)
-
-    def __repr__(self):
-        return 'varref %s' % (self.name)
 
 class Member(AST):
     def __init__(self, target, name):
@@ -250,14 +259,14 @@ class Member(AST):
 
 class Call(AST):
     def __init__(self, func, args):
-        super().__init__(dependencies=args, function_dependencies=[func])
-        self.func = func
+        self.func = func.as_function_ref(args)
+        super().__init__(dependencies=[self.func] + args)
         self.args = args
 
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
-        self.func.typecheck_func(symboltable, [a.type for a in self.args])
+        self.func.typecheck(symboltable)
 
     def emit(self, builder, stack):
         for a in self.args:
