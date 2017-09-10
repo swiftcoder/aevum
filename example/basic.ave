@@ -36,6 +36,9 @@ fn read_input() {
     let c : i32;
     c = getchar();
     putchar(c);
+    if (c != 113) { // ASCII code for lowercase 'q'
+        read_input();
+    }
 }
 
 // this is a comment

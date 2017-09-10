@@ -132,7 +132,8 @@ def p_expression_list_rest(p):
 
 def p_expression(p):
     '''expression : call_expression
-                  | dummy_member_expression'''
+                  | dummy_member_expression
+                  | cmp_expression'''
     p[0] = p[1]
 
 def p_call_expression_no_args(p):
@@ -141,6 +142,15 @@ def p_call_expression_no_args(p):
 def p_call_expression(p):
     'call_expression : named_reference LPAREN expression_list RPAREN'
     p[0] = ast.Call(p[1], p[3])
+
+def p_cmp_expression(p):
+    'cmp_expression : expression cmp_op expression'
+    p[0] = ast.comparison(p[2], p[1], p[3])
+
+def p_cmp_op(p):
+    '''cmp_op : EQUALS
+              | NEQUALS'''
+    p[0] = p[1]
 
 def p_dummy_member_expression(p):
     '''dummy_member_expression : member_expression

@@ -233,6 +233,9 @@ class FunctionRef(AST):
     def call(self, builder, stack):
         self.item.call(builder, stack)
 
+    def __repr__(self):
+        return 'funcref %s' % (self.name)
+
 class Member(AST):
     def __init__(self, target, name):
         super().__init__(dependencies=[target])
@@ -260,7 +263,7 @@ class Member(AST):
 class Call(AST):
     def __init__(self, func, args):
         self.func = func.as_function_ref(args)
-        super().__init__(dependencies=[self.func] + args)
+        super().__init__(dependencies=[self.func])
         self.args = args
 
     def typecheck(self, symboltable):
@@ -275,7 +278,7 @@ class Call(AST):
 
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
-        return '%s(%s)' % (str(self.func), args)
+        return 'call %s(%s)' % (str(self.func), args)
 
 class VarDecl(AST):
     def __init__(self, name, typeexpr):
@@ -338,7 +341,7 @@ class Struct(AST):
         members = ', '.join(str(s) for s in self._members) if self._members else ''
         return 'struct %s {%s}' % (self.name, members)
 
-class _BaseFunction(AST):
+class BaseFunction(AST):
     def typecheck(self, symboltable):
         for a in self.args:
             a.typecheck(symboltable)
@@ -357,7 +360,7 @@ class _BaseFunction(AST):
             args = []
         stack.append(builder.call(self.func, args))
 
-class Function(_BaseFunction):
+class Function(BaseFunction):
     def __init__(self, name, args, result, body):
         super().__init__(dependencies=[result] + args, internal_dependencies=body, has_symbol_table=True, symbols=[(name, self)], populate_symbols=args + body)
         self._name = name
@@ -397,7 +400,7 @@ class Function(_BaseFunction):
         body = '; '.join(str(s) for s in self.body) + ';' if self.body else ''
         return 'fn %s(%s) {%s}' % (self._name, args, body)
 
-class CFunction(_BaseFunction):
+class CFunction(BaseFunction):
     def __init__(self, name, args, result):
         super().__init__(dependencies=[result] + args, symbols=[(name, self)])
         self._name = name
@@ -435,3 +438,10 @@ class If(AST):
             with otherwise:
                 for b in self.block_else:
                     b.emit(builder, stack)
+
+def comparison(op, lhs, rhs):
+    name = {
+        '==': '__eq__',
+        '!=': '__neq__'
+    }[op]
+    return Call(VarRef(name), [lhs, rhs])

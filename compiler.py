@@ -6,6 +6,7 @@ if __name__ == '__main__':
     from parser import yacc
     from ast import Struct
     import type
+    import stdlib
     from llvmlite import ir, binding
     from sorting import topological_sort
     import argparse
@@ -18,13 +19,19 @@ if __name__ == '__main__':
     source = Path(args.intput_file[0]).read_text()
     ast = yacc.parse(source)
 
-    # first populate the symbol table
+    module = ir.Module(name="main")
+    module.triple = binding.get_default_triple()
+
+    dependencies = [(a, []) for a in type.builtin_types()]
+
     symboltable = type.builtins();
+    stdlib.standard_library(symboltable, dependencies, module);
+
+    # first populate the symbol table
     for s in ast:
         s.populate_symbol_table(symboltable)
 
     # gather type dependencies
-    dependencies = [(a, []) for a in type.builtin_types()]
     for s in ast:
         dependencies += s.dependent_types(symboltable)
 
@@ -39,9 +46,6 @@ if __name__ == '__main__':
         t.typecheck_body(symboltable)
 
     #print('\n' + '\n\n'.join(str(s) for s in ast))
-
-    module = ir.Module(name="main")
-    module.triple = binding.get_default_triple()
 
     for s in ast:
         s.emit(module)
