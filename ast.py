@@ -27,7 +27,7 @@ class AST(object):
 
     def populate_symbol_table(self, symboltable):
         for name, symbol in self._symbols:
-            symboltable.put(self.name, symbol)
+            symboltable.put(name, symbol)
 
         if self._has_symbol_table:
             symboltable = SymbolTable(symboltable)
@@ -338,27 +338,46 @@ class Struct(AST):
         members = ', '.join(str(s) for s in self._members) if self._members else ''
         return 'struct %s {%s}' % (self.name, members)
 
-class Function(AST):
+class _BaseFunction(AST):
+    def typecheck(self, symboltable):
+        for a in self.args:
+            a.typecheck(symboltable)
+
+        self.irtype = ir.FunctionType(self.result.type.irtype, (a.type.irtype for a in self.args), False)
+
+    def emit(self, module):
+        self.func = ir.Function(module, self.irtype, self.name())
+
+    def call(self, builder, stack):
+        count = len(self.func.args)
+        if count > 0:
+            args = stack[-count:]
+            del stack[-count:]
+        else:
+            args = []
+        stack.append(builder.call(self.func, args))
+
+class Function(_BaseFunction):
     def __init__(self, name, args, result, body):
         super().__init__(dependencies=[result] + args, internal_dependencies=body, has_symbol_table=True, symbols=[(name, self)], populate_symbols=args + body)
-        self.name = name
+        self._name = name
         self.args = args
         self.body = body
         self.result = result
 
     def typecheck(self, symboltable):
-        for a in self.args:
-            a.typecheck(symboltable)
-            self.symboltable.put(a.name, a)
+        super().typecheck(symboltable)
 
-        self.irtype = ir.FunctionType(self.result.type.irtype, (a.type.irtype for a in self.args), False)
+        for a in self.args:
+            self.symboltable.put(a.name, a)
 
     def typecheck_body(self, symboltable):
         for b in self.body:
             b.typecheck(self.symboltable)
 
     def emit(self, module):
-        self.func = ir.Function(module, self.irtype, self._mangle())
+        super().emit(module)
+
         block = self.func.append_basic_block('entry')
         builder = ir.IRBuilder(block)
         for a, i in zip(self.args, self.func.args):
@@ -370,51 +389,27 @@ class Function(AST):
             b.emit(builder, stack)
         builder.ret_void()
 
-    def call(self, builder, stack):
-        count = len(self.func.args)
-        if count > 0:
-            args = stack[-count:]
-            del stack[-count:]
-        else:
-            args = []
-        stack.append(builder.call(self.func, args))
-
-    def _mangle(self):
-        return names.mangle(self.name, [a.type.name for a in self.args])
+    def name(self):
+        return names.mangle(self._name, [a.type.name for a in self.args])
 
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
         body = '; '.join(str(s) for s in self.body) + ';' if self.body else ''
-        return 'fn %s(%s) {%s}' % (self.name, args, body)
+        return 'fn %s(%s) {%s}' % (self._name, args, body)
 
-class CFunction(AST):
+class CFunction(_BaseFunction):
     def __init__(self, name, args, result):
         super().__init__(dependencies=[result] + args, symbols=[(name, self)])
-        self.name = name
+        self._name = name
         self.args = args
         self.result = result
 
-    def typecheck(self, symboltable):
-        for a in self.args:
-            a.typecheck(symboltable)
-
-        self.irtype = ir.FunctionType(self.result.type.irtype, (a.type.irtype for a in self.args), False)
-
-    def emit(self, module):
-        self.func = ir.Function(module, self.irtype, self.name)
-
-    def call(self, builder, stack):
-        count = len(self.func.args)
-        if count > 0:
-            args = stack[-count:]
-            del stack[-count:]
-        else:
-            args = []
-        stack.append(builder.call(self.func, args))
+    def name(self):
+        return self._name
 
     def __repr__(self):
         args = ', '.join(str(a) for a in self.args) if self.args else ''
-        return 'cdecl fn %s(%s)' % (self.name, args)
+        return 'cdecl fn %s(%s)' % (self._name, args)
 
 class If(AST):
     def __init__(self, expr, block_then, block_else=[]):
