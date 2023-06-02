@@ -10,6 +10,7 @@ MATCH_FAILED = object()
 class ParseError(Exception):
     pass
 
+
 @dataclass
 class ParseInput:
     tokens: Any
@@ -18,27 +19,28 @@ class ParseInput:
     def __init__(self, tokens: list[Any]):
         self.length = len(tokens)
         self.tokens = seekable(tokens)
-    
+
     def __len__(self):
         return self.length
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         return next(self.tokens)
-    
+
     def __bool__(self):
         return bool(self.tokens)
-    
+
     def index(self) -> int:
         return self.tokens._index or 0
-    
+
     def seek(self, index: int):
         self.tokens.seek(index)
-    
+
     def peek(self, default):
         return self.tokens.peek(default)
+
 
 @dataclass
 class ParseResult:
@@ -83,12 +85,15 @@ class Parser:
             )
 
         _counters[(self, index)] = _counters[(self, index)] + 1
-        print(f"{self.name or id(self)}@{index} -> {_counters[(self, index)]} < {len(tokens)}")
+        print(
+            f"{self.name or id(self)}@{index} -> {_counters[(self, index)]} < {len(tokens)}"
+        )
 
         result = self.func(tokens)
-        # print(
-        #     f"memoizing result {result.result} for ({self.name or id(self)}, {index})"
-        # )
+        if result.result != MATCH_FAILED:
+            print(
+                f"memoizing result {result.result} for ({self.name or id(self)}, {index})"
+            )
         _memo[(self, index)] = result
         return result
 
@@ -217,7 +222,7 @@ def map(parser: Parser, f: Callable):
     return Parser(map_parser)
 
 
-def forward() -> tuple[Callable, Parser]:
+def forward() -> tuple[Callable[[Parser], None], Parser]:
     p: list[Parser | None] = [None]
 
     def set_parser(parser: Parser):

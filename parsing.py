@@ -52,22 +52,48 @@ def parse(input: list[Token]):
         number()[lambda n: Number(n.value)],
         string()[lambda s: StringLiteral(s.value)],
         seq(punctuation("("), expr_p, punctuation(")"))[lambda x: x[1]],
-        # expr_p,
     ).tag("atom")
 
-    factor_p = choice(
-        seq(atom_p, choice(punctuation("+"), punctuation("-")), expr_p)[
-            lambda v: Operator(v[1].value, v[0], v[2])
-        ],
-        atom_p,
-    ).tag("factor")
+    set_postfix_p, postfix_p = forward()
+    set_postfix_p(
+        choice(
+            seq(postfix_p, punctuation("."), ident())[
+                lambda x: MemberAccess(x[0], x[2].value)
+            ],
+            seq(
+                postfix_p,
+                punctuation("("),
+                separated_by(expr_p, punctuation(",")),
+                punctuation(")"),
+            )[lambda x: FunctionCall(x[0], x[2])],
+            seq(postfix_p, punctuation("["), expr_p, punctuation("]"))[
+                lambda x: ArrayIndex(x[0], x[2])
+            ],
+            atom_p,
+        ).tag("postfix")
+    )
 
-    partial_expr_p = choice(
-        seq(factor_p, choice(punctuation("*"), punctuation("/")), expr_p)[
-            lambda v: Operator(v[1].value, v[0], v[2])
-        ],
-        factor_p,
-    ).tag("partisl_expr")
+    set_mul_p, mul_p = forward()
+    set_mul_p(
+        choice(
+            seq(mul_p, choice(punctuation("*"), punctuation("/")), expr_p)[
+                lambda v: Operator(v[1].value, v[0], v[2])
+            ],
+            postfix_p,
+        ).tag("multiply")
+    )
+
+    set_add_p, add_p = forward()
+    set_add_p(
+        choice(
+            seq(add_p, choice(punctuation("+"), punctuation("-")), expr_p)[
+                lambda v: Operator(v[1].value, v[0], v[2])
+            ],
+            mul_p,
+        ).tag("add")
+    )
+
+    set_expr_p(add_p)
 
     # set_expr_prime_p, expr_prime_p = forward()
     # set_expr_prime_p(
@@ -99,28 +125,28 @@ def parse(input: list[Token]):
 
     # set_expr_p(seq(partial_expr_p[push], expr_prime_p)[pop])
 
-    set_expr_p(
-        choice(
-            seq(
-                partial_expr_p[push],
-                optional(
-                    choice(
-                        seq(punctuation("."), ident())[
-                            lambda x: MemberAccess(pop(), x[1].value)
-                        ][push],
-                        seq(
-                            punctuation("("),
-                            separated_by(expr_p, punctuation(",")),
-                            punctuation(")"),
-                        )[lambda x: FunctionCall(pop(), x[1])][push],
-                        seq(punctuation("["), expr_p, punctuation("]"))[
-                            lambda x: ArrayIndex(pop(), x[1])
-                        ][push],
-                    )
-                ),
-            )[pop],
-        )
-    )
+    # set_expr_p(
+    #     choice(
+    #         seq(
+    #             partial_expr_p[push],
+    #             optional(
+    #                 choice(
+    #                     seq(punctuation("."), ident())[
+    #                         lambda x: MemberAccess(pop(), x[1].value)
+    #                     ][push],
+    #                     seq(
+    #                         punctuation("("),
+    #                         separated_by(expr_p, punctuation(",")),
+    #                         punctuation(")"),
+    #                     )[lambda x: FunctionCall(pop(), x[1])][push],
+    #                     seq(punctuation("["), expr_p, punctuation("]"))[
+    #                         lambda x: ArrayIndex(pop(), x[1])
+    #                     ][push],
+    #                 )
+    #             ),
+    #         )[pop],
+    #     )
+    # )
 
     # p = p . ident | p ( args ) | expr
     # p = expr !( (. ident) | ( (args)))
