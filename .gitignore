@@ -1,1 +1,16 @@
-/target
+# vscode
+.vscode
+
+# python
+__pycache__
+
+# mypy
+.mypy_cache
+
+# pyenv
+.python-version
+
+# antlr related files
+.antlr
+*.interp
+*.tokens
