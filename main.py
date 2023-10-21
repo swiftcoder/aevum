@@ -27,15 +27,18 @@ fn add(a: i32, b: i32) -> i32 {
 }
 
 fn main() {
+    add(2, 3);
     println("Hello, world!");
     println("it's a wonderful world");
 }
 """
 
 import sys
+from pprint import pprint
 from antlr4 import *
 from AevumLexer import AevumLexer
 from AevumParser import AevumParser
+from abstract_syntax_tree import build_ast
 import encode
 
 
@@ -45,34 +48,38 @@ tokens = CommonTokenStream(lexer)
 parser = AevumParser(tokens)
 tree = parser.module()
 
-wat = encode.encode(tree, parser)
-print(wat)
+ast = build_ast(tree)
+pprint(ast)
+ir = encode.encode(ast)
+for idx, line in enumerate(ir.split("\n")):
+    print(idx + 1, line)
 
-from wasmer import (
-    engine,
-    Store,
-    Module,
-    Instance,
-    ImportObject,
-    Function,
-    Memory,
-    MemoryType,
+import llvmlite.binding as llvm
+from ctypes import CFUNCTYPE, c_int32, c_void_p, string_at, cast
+
+llvm.initialize()
+llvm.initialize_native_target()
+llvm.initialize_native_asmprinter()
+
+
+def println(l: c_int32, s: c_void_p):
+    value = string_at(s, l)
+    print(value.decode())
+
+
+println_type = CFUNCTYPE(None, c_int32, c_void_p)
+println_func = println_type(println)
+
+lljit = llvm.create_lljit_compiler()
+rt = (
+    llvm.JITLibraryBuilder()
+    .add_ir(ir)
+    .export_symbol("main")
+    .import_symbol("println", cast(println_func, c_void_p).value)
+    .link(lljit, "__main__")
 )
 
-store = Store()
-module = Module(store, wat)
-memory = Memory(store, MemoryType(minimum=1))
+main_type = CFUNCTYPE(None)
+main_func = main_type(rt["main"])
 
-
-def println(start: int, length: int):
-    s = bytearray(memory.uint8_view(offset=start)[:length]).decode()
-    print(s)
-
-
-imports = ImportObject()
-imports.register("runtime", {"memory": memory})
-imports.register("", {"println": Function(store, println)})
-
-instance = Instance(module, imports)
-
-instance.exports.main()
+main_func()

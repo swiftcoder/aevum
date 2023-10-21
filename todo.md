@@ -1,0 +1,7 @@
+- to_string() for builtin types (i32)
+  - need to be able to dynamically allocate strings
+    - need an allocator
+  - need to be able to dispose of dynamic allocations
+    - need escape analysis
+- recursion
+  - store function delcarations in symbol table before evaluating function body
