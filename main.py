@@ -22,12 +22,18 @@
 # """
 
 code = """
+struct Foo {
+    data: i32,
+    log: str,
+}
+
 fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
 fn main() {
-    add(2, 3);
+    let foo = Foo{data: 5, log: "hello"};
+    add(2, foo.data);
     println("Hello, world!");
     println("it's a wonderful world");
 }

@@ -9,9 +9,11 @@ from llvmlite import ir
 class Ident:
     value: str
 
+
 @dataclass
 class NumericLiteral:
     value: str
+
 
 @dataclass
 class StringLiteral:
@@ -26,6 +28,19 @@ class Operator:
 
 
 @dataclass
+class Field:
+    name: str
+    typename: str
+
+
+@dataclass
+class Struct:
+    name: str
+    members: list[Field]
+    llvm_type: Optional[ir.Type] = None
+
+
+@dataclass
 class Argument:
     name: str
     typename: str
@@ -37,14 +52,33 @@ class Function:
     args: list
     return_type: str
     statements: list
-    func: Optional[ir.Type] = None
+    llvm_type: Optional[ir.Type] = None
+    llvm_value: Optional[Any] = None
 
+@dataclass
+class Let:
+    name: str
+    value: Any
+
+@dataclass
+class FieldInitialiser:
+    name: str
+    value: Any
+
+@dataclass
+class StructLiteral:
+    name: str
+    members: list[FieldInitialiser]
 
 @dataclass
 class FunctionCall:
     name: str
     args: list
 
+@dataclass
+class MemberAccess:
+    source: Any
+    field: str
 
 # walks the parse tree and converts it to an AST
 class ASTGenerator(AevumVisitor):
@@ -53,6 +87,19 @@ class ASTGenerator(AevumVisitor):
 
     def visitDeclaration(self, ctx: AevumParser.DeclarationContext):
         return self.visit(ctx.children[0])
+
+    def visitStruct(self, ctx: AevumParser.StructContext):
+        name = self.visit(ctx.children[1]).value
+        members = self.visit(ctx.children[3])
+        return Struct(name, members)
+
+    def visitField_list(self, ctx: AevumParser.Field_listContext):
+        return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
+
+    def visitField(self, ctx: AevumParser.FieldContext):
+        return Field(
+            self.visit(ctx.children[0]).value, self.visit(ctx.children[2]).value
+        )
 
     def visitFunction(self, ctx: AevumParser.FunctionContext):
         name = self.visit(ctx.children[1]).value
@@ -63,10 +110,10 @@ class ASTGenerator(AevumVisitor):
         # print(f)
         return f
 
-    def visitArg_list(self, ctx: AevumParser.Field_listContext):
+    def visitArg_list(self, ctx: AevumParser.Arg_listContext):
         return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
 
-    def visitArg(self, ctx: AevumParser.FieldContext):
+    def visitArg(self, ctx: AevumParser.ArgContext):
         return Argument(
             self.visit(ctx.children[0]).value, self.visit(ctx.children[2]).value
         )
@@ -81,6 +128,11 @@ class ASTGenerator(AevumVisitor):
     def visitStatement_list(self, ctx: AevumParser.Statement_listContext):
         return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
 
+    def visitLetStatement(self, ctx:AevumParser.LetStatementContext):
+        name = self.visit(ctx.children[1]).value
+        expr = self.visit(ctx.children[3])
+        return Let(name, expr)
+
     def visitExprStatement(self, ctx: AevumParser.ExprStatementContext):
         return self.visit(ctx.children[0])
 
@@ -91,6 +143,11 @@ class ASTGenerator(AevumVisitor):
         return FunctionCall(
             self.visit(ctx.children[0]), self.visit(ctx.children[2]) or []
         )
+
+    def visitMemberAccess(self, ctx:AevumParser.MemberAccessContext):
+        source = self.visit(ctx.children[0])
+        field = self.visit(ctx.children[2]).value
+        return MemberAccess(source, field)
 
     def visitAddition(self, ctx: AevumParser.AdditionContext):
         return Operator(
@@ -108,10 +165,23 @@ class ASTGenerator(AevumVisitor):
     def visitString_literal(self, ctx: AevumParser.String_literalContext):
         return StringLiteral(ctx.getText()[1:-1])
 
+    def visitStruct_literal(self, ctx:AevumParser.Struct_literalContext):
+        name = self.visit(ctx.children[0]).value
+        members = self.visit(ctx.children[2])
+        return StructLiteral(name, members)
+
+    def visitField_initialiser_list(self, ctx:AevumParser.Field_initialiser_listContext):
+        return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
+
+    def visitField_initialiser(self, ctx:AevumParser.Field_initialiserContext):
+        name = self.visit(ctx.children[0]).value
+        value = self.visit(ctx.children[2])
+        return FieldInitialiser(name, value)
+
     def visitIdentifier(self, ctx: AevumParser.IdentifierContext):
         return Ident(ctx.getText())
 
-    def visitNumber(self, ctx:AevumParser.NumberContext):
+    def visitNumber(self, ctx: AevumParser.NumberContext):
         return NumericLiteral(ctx.getText())
 
     def visitTerminal(self, node):
