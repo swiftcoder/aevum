@@ -3,6 +3,8 @@ from symbols import SymbolTable
 from abstract_syntax_tree import *
 from llvmlite import ir
 
+from typenames import ArrayType, BasicType, FunctionType, StructType, i32, i8, void
+
 i8_type = ir.IntType(8)
 i32_type = ir.IntType(32)
 
@@ -12,64 +14,39 @@ ptr_size_type = i32_type
 
 # Encodes an AST into WAT assembly
 class Encoder:
-    def __init__(self, symbols: SymbolTable):
+    def __init__(self, module: ir.Module, symbols: SymbolTable):
+        self.module = module
         self.symbols = symbols
         self.next_constant = 0
-        self.types: dict[str | ir.Type] = {
-            None: ir.VoidType(),
-            "i32": i32_type,
-            "str": ir.LiteralStructType([ptr_size_type, ir.PointerType(char_type)]),
+        self.types: dict[str | BasicType] = {
+            None: void,
+            "i32": i32,
+            "str": ArrayType(i8),
         }
 
-        self.module = ir.Module(name="__main__")
-
-        self.symbols.define(
-            "println",
-            Function(
-                "println",
-                [Argument("arg0", "str")],
-                None,
-                [],
-                ir.FunctionType(ir.VoidType(), [self.types["str"]]),
-                ir.Function(
-                    self.module,
-                    ir.FunctionType(ir.VoidType(), [self.types["str"]]),
-                    "println",
-                ),
-            ),
-        )
-
-    def encode_ast(self, ast: list[Function]):
+    def visit_ast(self, ast: list[Function]):
         for declaration in ast:
             if isinstance(declaration, Struct):
-                self.encode_struct(declaration)
+                self.visit_struct(declaration)
             if isinstance(declaration, Function):
-                self.encode_function(declaration)
+                self.visit_function(declaration)
 
-    def encode_struct(self, s: Struct):
+    def visit_struct(self, s: Struct):
         self.symbols.define(s.name, s)
 
-        members = [self.types[m.typename] for m in s.members]
+        self.types[s.name] = s.typeclass
 
-        s.llvm_type = self.module.context.get_identified_type(s.name)
-        s.llvm_type.set_body(*members)
-
-        self.types[s.name] = s.llvm_type
-
-    def encode_function(self, f: Function):
+    def visit_function(self, f: Function):
         self.symbols.define(f.name, f)
         self.symbols.push_scope()
-
-        args = [self.types[a.typename] for a in f.args]
-        return_type = self.types[f.return_type]
-
-        f.llvm_type = ir.FunctionType(return_type, args)
-        func = ir.Function(self.module, f.llvm_type, name=f.name)
+        
+        func = ir.Function(self.module, f.typeclass.llvm_type, name=f.name)
         f.llvm_value = func
 
         for a, arg in zip(f.args, func.args):
             arg.name = a.name
-            self.symbols.define(a.name, arg)
+            a.llvm_value = arg
+            self.symbols.define(a.name, a)
 
         block = func.append_basic_block(name="entry")
         builder = ir.IRBuilder(block)
@@ -77,9 +54,9 @@ class Encoder:
         last: Any = None
         for s in f.statements:
             if isinstance(s, Let):
-                self.encode_let(s, builder)
+                self.visit_let(s, builder)
             else:
-                last = self.encode_expr(s, builder)
+                last = self.visit_expr(s, builder)
 
         if last and last.type != ir.VoidType():
             builder.ret(last)
@@ -88,29 +65,38 @@ class Encoder:
 
         self.symbols.pop_scope()
 
-    def encode_let(self, s: Let, builder: ir.IRBuilder):
-        value = self.encode_expr(s.value, builder)
-        self.symbols.define(s.name, value)
+    def visit_let(self, s: Let, builder: ir.IRBuilder):
+        s.llvm_value = self.visit_expr(s.value, builder)
+        s.typeclass = s.value.typeclass
+        self.symbols.define(s.name, s)
 
-    def encode_expr(self, s, builder: ir.IRBuilder):
+    def visit_expr(self, s, builder: ir.IRBuilder):
         if isinstance(s, FunctionCall):
             f = self.symbols.lookup(s.name.value)
-            print(f)
-            args = [self.encode_expr(a, builder) for a in s.args]
+            args = [self.visit_expr(a, builder) for a in s.args]
             return builder.call(f.llvm_value, args)
         if isinstance(s, Operator):
-            left = self.encode_expr(s.left, builder)
-            right = self.encode_expr(s.right, builder)
-            return builder.add(left, right)
+            left = self.visit_expr(s.left, builder)
+            right = self.visit_expr(s.right, builder)
+            if s.op == '+':
+                return builder.add(left.llvm_value, right.llvm_value)
+            if s.op == '-':
+                return builder.sub(left.llvm_value, right.llvm_value)
+            if s.op == '*':
+                return builder.mul(left.llvm_value, right.llvm_value)
+            if s.op == '/':
+                return builder.udiv(left.llvm_value, right.llvm_value)
         if isinstance(s, MemberAccess):
-            source: ir.Aggregate = self.encode_expr(s.source, builder)
+            source = self.visit_expr(s.source, builder)
+            s.typeclass = s.source.typeclass
             pointer: ir.GEPInstr = builder.gep(
-                source, [ir.Constant(i32_type, 0), ir.Constant(i32_type, 0)]
+                source.llvm_value, [ir.Constant(i32_type, 0), ir.Constant(i32_type, 0)]
             )
-            print(pointer)
+            # print(pointer)
             return builder.load(pointer)
         if isinstance(s, Ident):
-            return self.symbols.lookup(s.value)
+            t = self.symbols.lookup(s.value)
+            return t
         if isinstance(s, NumericLiteral):
             return ir.Constant(i32_type, int(s.value))
         if isinstance(s, StringLiteral):
@@ -132,10 +118,10 @@ class Encoder:
             )
         if isinstance(s, StructLiteral):
             t: Struct = self.symbols.lookup(s.name)
-            storage = builder.alloca(t.llvm_type)
-            literal = ir.Constant(t.llvm_type, ir.Undefined)
+            storage = builder.alloca(t.typeclass.llvm_type)
+            literal = ir.Constant(t.typeclass.llvm_type, ir.Undefined)
             initialisers = {
-                m.name: self.encode_expr(m.value, builder) for m in s.members
+                m.name: self.visit_expr(m.value, builder) for m in s.members
             }
             for i, m in enumerate(t.members):
                 if m.name in initialisers:
@@ -148,11 +134,3 @@ class Encoder:
     def __repr__(self):
         return str(self.module)
 
-
-def encode(ast):
-    symbols = SymbolTable()
-
-    encoder = Encoder(symbols)
-    encoder.encode_ast(ast)
-
-    return str(encoder)

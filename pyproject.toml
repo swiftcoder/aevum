@@ -1,0 +1,15 @@
+[project]
+name = "aevum"
+version = "0.0.1-alpha1"
+description = ""
+authors = [
+    {name = "Tristam MacDonald", email = "tristam@trist.am"},
+]
+dependencies = [
+    "llvmlite>=0.41.1",
+    "antlr4-python3-runtime>=4.13.1",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+

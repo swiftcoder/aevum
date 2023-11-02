@@ -46,6 +46,9 @@ from AevumLexer import AevumLexer
 from AevumParser import AevumParser
 from abstract_syntax_tree import build_ast
 import encode
+from module import build_module
+from symbols import setup_symbol_table
+import typecheck
 
 
 input = InputStream(code)
@@ -55,10 +58,11 @@ parser = AevumParser(tokens)
 tree = parser.module()
 
 ast = build_ast(tree)
+ir = build_module("__main__", ast)
+symbols = setup_symbol_table()
 pprint(ast)
-ir = encode.encode(ast)
-for idx, line in enumerate(ir.split("\n")):
-    print(idx + 1, line)
+# for idx, line in enumerate(ir.split("\n")):
+#     print(idx + 1, line)
 
 import llvmlite.binding as llvm
 from ctypes import CFUNCTYPE, c_int32, c_void_p, string_at, cast
