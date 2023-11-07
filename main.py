@@ -36,6 +36,12 @@ fn main() {
     add(2, foo.data);
     println("Hello, world!");
     println("it's a wonderful world");
+    let i = 5;
+    if i < 10 {
+        println("inside if statement");
+    } else {
+        println("inside else clause");
+    }
 }
 """
 
@@ -60,9 +66,9 @@ tree = parser.module()
 ast = build_ast(tree)
 ir = build_module("__main__", ast)
 symbols = setup_symbol_table()
-pprint(ast)
-# for idx, line in enumerate(ir.split("\n")):
-#     print(idx + 1, line)
+# pprint(ast)
+for idx, line in enumerate(ir.split("\n")):
+    print(idx + 1, line)
 
 import llvmlite.binding as llvm
 from ctypes import CFUNCTYPE, c_int32, c_void_p, string_at, cast

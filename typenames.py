@@ -11,6 +11,7 @@ class BasicType(object):
 
 
 void = BasicType(name='void', llvm_type=ir.VoidType())
+boolean = BasicType(name='boolean', llvm_type=ir.IntType(1))
 i8 = BasicType(name='i8', llvm_type=ir.IntType(8))
 i32 = BasicType(name='i32', llvm_type=ir.IntType(32))
 

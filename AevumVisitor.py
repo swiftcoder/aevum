@@ -1,4 +1,4 @@
-# Generated from .\Aevum.g4 by ANTLR 4.13.0
+# Generated from Aevum.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .AevumParser import AevumParser
@@ -94,6 +94,16 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by AevumParser#Comparison.
+    def visitComparison(self, ctx:AevumParser.ComparisonContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by AevumParser#IfElse.
+    def visitIfElse(self, ctx:AevumParser.IfElseContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by AevumParser#Multplication.
     def visitMultplication(self, ctx:AevumParser.MultplicationContext):
         return self.visitChildren(ctx)
@@ -124,8 +134,13 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by AevumParser#number.
-    def visitNumber(self, ctx:AevumParser.NumberContext):
+    # Visit a parse tree produced by AevumParser#boolean_literal.
+    def visitBoolean_literal(self, ctx:AevumParser.Boolean_literalContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by AevumParser#numeric_literal.
+    def visitNumeric_literal(self, ctx:AevumParser.Numeric_literalContext):
         return self.visitChildren(ctx)
 
 

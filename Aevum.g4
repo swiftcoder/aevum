@@ -30,23 +30,28 @@ statement:
 expr_list: expr (',' expr)* ','? |;
 
 expr:
-	expr '[' expr ']'			# ArrayIndex
-	| expr '(' expr_list ')'	# FunctionCall
-	| expr '.' identifier		# MemberAccess
-	| expr ('*' | '/') expr		# Multplication
-	| expr ('+' | '-') expr		# Addition
-	| atom						# AtomExpr;
+	expr '[' expr ']'						# ArrayIndex
+	| expr '(' expr_list ')'				# FunctionCall
+	| expr '.' identifier					# MemberAccess
+	| expr ('*' | '/') expr					# Multplication
+	| expr ('+' | '-') expr					# Addition
+	| expr ('==' | '!=' | '<' | '<=' | '>' | '>=') expr 	# Comparison
+	| 'if' expr '{' statement_list '}' ('else' '{' statement_list '}')?		# IfElse
+	| atom									# AtomExpr;
 
 atom:
 	identifier
-	| number
+	| boolean_literal
+	| numeric_literal
 	| string_literal
 	| struct_literal
 	| array_literal;
 
 identifier: IDENT;
 
-number: NUMBER;
+boolean_literal: 'true' | 'false';
+
+numeric_literal: NUMBER;
 
 string_literal: STRING;
 

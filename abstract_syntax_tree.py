@@ -18,6 +18,11 @@ class Ident(Node):
 
 
 @dataclass
+class BooleanLiteral(Node):
+    value: bool
+
+
+@dataclass
 class NumericLiteral(Node):
     value: str
 
@@ -32,6 +37,20 @@ class Operator(Node):
     op: str
     left: Any
     right: Any
+
+
+@dataclass
+class Comparison(Node):
+    op: str
+    left: Any
+    right: Any
+
+
+@dataclass
+class IfElse(Node):
+    test: Node
+    if_statements: list[Node]
+    else_statements: list[Node]
 
 
 @dataclass
@@ -56,7 +75,7 @@ class Argument(Node):
 @dataclass
 class Function(Node):
     name: str
-    args: list
+    args: list[Argument]
     return_type: str
     statements: list
     llvm_value: Optional[Any] = None
@@ -172,6 +191,12 @@ class ASTGenerator(AevumVisitor):
             self.visit(ctx.children[2]),
         )
 
+    def visitComparison(self, ctx: AevumParser.ComparisonContext):
+        return Comparison(self.visit(ctx.children[1]), self.visit(ctx.children[0]), self.visit(ctx.children[2]))
+
+    def visitIfElse(self, ctx:AevumParser.IfElseContext):
+        return IfElse(self.visit(ctx.children[1]), self.visit(ctx.children[3]), self.visit(ctx.children[7]) if len(ctx.children) > 7 else list())
+
     def visitAtomExpr(self, ctx: AevumParser.AtomExprContext):
         return self.visit(ctx.children[0])
 
@@ -199,7 +224,10 @@ class ASTGenerator(AevumVisitor):
     def visitIdentifier(self, ctx: AevumParser.IdentifierContext):
         return Ident(ctx.getText())
 
-    def visitNumber(self, ctx: AevumParser.NumberContext):
+    def visitBoolean_literal(self, ctx: AevumParser.Boolean_literalContext):
+        return BooleanLiteral(ctx.getText() == 'true')
+
+    def visitNumeric_literal(self, ctx: AevumParser.Numeric_literalContext):
         return NumericLiteral(ctx.getText())
 
     def visitTerminal(self, node):
