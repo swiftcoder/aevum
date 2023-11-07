@@ -25,6 +25,7 @@ code = """
 struct Foo {
     data: i32,
     log: str,
+    number: i32
 }
 
 fn add(a: i32, b: i32) -> i32 {
@@ -32,12 +33,11 @@ fn add(a: i32, b: i32) -> i32 {
 }
 
 fn main() {
-    let foo = Foo{data: 5, log: "hello"};
+    let foo = Foo{data: 5, log: "hello", number: 11};
     add(2, foo.data);
     println("Hello, world!");
     println("it's a wonderful world");
-    let i = 5;
-    if i < 10 {
+    if foo.number < 10 {
         println("inside if statement");
     } else {
         println("inside else clause");

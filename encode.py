@@ -99,9 +99,9 @@ class Encoder:
                         self.visit_statement(t, builder)
         if isinstance(s, MemberAccess):
             source = self.visit_expr(s.source, builder)
-            s.typeclass = s.source.typeclass
+            field_index = s.source.typeclass.member_names[s.field];
             pointer: ir.GEPInstr = builder.gep(
-                source, [ir.Constant(i32.llvm_type, 0), ir.Constant(i32.llvm_type, 0)]
+                source, [ir.Constant(i32.llvm_type, 0), ir.Constant(i32.llvm_type, field_index)]
             )
             return builder.load(pointer)
         if isinstance(s, Ident):

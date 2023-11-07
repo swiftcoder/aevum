@@ -32,6 +32,7 @@ class ArrayType(BasicType):
 @dataclass
 class StructType(BasicType):
     members: list[BasicType]
+    member_names: dict[str | int]
 
 @dataclass
 class FunctionType(BasicType):

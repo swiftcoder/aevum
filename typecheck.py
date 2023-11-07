@@ -25,13 +25,15 @@ class TypeChecker:
     def visit_struct(self, s: Struct):
         self.symbols.define(s.name, s)
 
-        for m in s.members:
+        member_names = dict()
+        for (i, m) in enumerate(s.members):
             m.typeclass = self.types[m.typename]
-
+            member_names[m.name] = i
+        
         llvm_type = self.module.context.get_identified_type(s.name)
         llvm_type.set_body(*[m.typeclass.llvm_type for m in s.members])
         s.typeclass = StructType(
-            name=s.name, members=s.members, llvm_type=llvm_type)
+            name=s.name, members=s.members, member_names=member_names, llvm_type=llvm_type)
 
         self.types[s.name] = s.typeclass
 
@@ -78,12 +80,10 @@ class TypeChecker:
         if isinstance(s, Comparison):
             self.visit_expr(s.left)
             self.visit_expr(s.right)
-            print(s)
             assert (s.left.typeclass == s.right.typeclass)
             s.typeclass = boolean
         if isinstance(s, IfElse):
             self.visit_expr(s.test)
-            print(s.test)
             assert (s.test.typeclass == boolean)
             s.typeclass = void
             if len(s.if_statements) > 0:
@@ -96,8 +96,9 @@ class TypeChecker:
                 assert(s.if_statements[-1].typeclass == s.else_statements[-1].typeclass)
         if isinstance(s, MemberAccess):
             self.visit_expr(s.source)
+            field_index = s.source.typeclass.member_names[s.field];
             assert (isinstance(s.source.typeclass, StructType))
-            s.typeclass = s.source.typeclass
+            s.typeclass = s.source.typeclass.members[field_index].typeclass
         if isinstance(s, Ident):
             t = self.symbols.lookup(s.value)
             s.typeclass = t.typeclass
