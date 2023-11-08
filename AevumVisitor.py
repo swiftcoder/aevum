@@ -24,13 +24,13 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by AevumParser#field_list.
-    def visitField_list(self, ctx:AevumParser.Field_listContext):
+    # Visit a parse tree produced by AevumParser#variable_list.
+    def visitVariable_list(self, ctx:AevumParser.Variable_listContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by AevumParser#field.
-    def visitField(self, ctx:AevumParser.FieldContext):
+    # Visit a parse tree produced by AevumParser#variable.
+    def visitVariable(self, ctx:AevumParser.VariableContext):
         return self.visitChildren(ctx)
 
 
@@ -46,16 +46,6 @@ class AevumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by AevumParser#function.
     def visitFunction(self, ctx:AevumParser.FunctionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by AevumParser#arg_list.
-    def visitArg_list(self, ctx:AevumParser.Arg_listContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by AevumParser#arg.
-    def visitArg(self, ctx:AevumParser.ArgContext):
         return self.visitChildren(ctx)
 
 
@@ -104,6 +94,11 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by AevumParser#ParenthicalExpr.
+    def visitParenthicalExpr(self, ctx:AevumParser.ParenthicalExprContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by AevumParser#Multplication.
     def visitMultplication(self, ctx:AevumParser.MultplicationContext):
         return self.visitChildren(ctx)
@@ -121,6 +116,11 @@ class AevumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by AevumParser#ArrayIndex.
     def visitArrayIndex(self, ctx:AevumParser.ArrayIndexContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by AevumParser#AssignExpr.
+    def visitAssignExpr(self, ctx:AevumParser.AssignExprContext):
         return self.visitChildren(ctx)
 
 

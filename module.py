@@ -1,6 +1,6 @@
 
 from llvmlite import ir
-from abstract_syntax_tree import Argument, Function
+from abstract_syntax_tree import Variable, Function
 from encode import Encoder
 from symbols import SymbolTable
 
@@ -17,7 +17,7 @@ def build_module(name: str, ast: list[Function]) -> str:
         "println",
         Function(
             "println",
-            [Argument("arg0", "str")],
+            [Variable("arg0", "str")],
             None,
             [],
             typeclass=FunctionType("println", void, [ArrayType(i8)]),

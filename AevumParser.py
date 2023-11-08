@@ -10,91 +10,85 @@ else:
 
 def serializedATN():
     return [
-        4,1,34,244,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,34,229,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
-        7,20,2,21,7,21,2,22,7,22,1,0,5,0,48,8,0,10,0,12,0,51,9,0,1,0,1,0,
-        1,1,1,1,3,1,57,8,1,1,2,1,2,1,2,1,2,1,2,1,2,1,3,1,3,1,3,5,3,68,8,
-        3,10,3,12,3,71,9,3,1,3,3,3,74,8,3,1,3,3,3,77,8,3,1,4,1,4,1,4,1,4,
-        1,5,1,5,1,5,1,5,1,5,3,5,88,8,5,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,
-        6,1,6,1,7,1,7,1,7,5,7,103,8,7,10,7,12,7,106,9,7,1,7,3,7,109,8,7,
-        1,7,3,7,112,8,7,1,8,1,8,1,8,1,8,1,9,1,9,3,9,120,8,9,1,10,1,10,1,
+        7,20,1,0,5,0,44,8,0,10,0,12,0,47,9,0,1,0,1,0,1,1,1,1,3,1,53,8,1,
+        1,2,1,2,1,2,1,2,1,2,1,2,1,3,1,3,1,3,5,3,64,8,3,10,3,12,3,67,9,3,
+        1,3,3,3,70,8,3,1,3,3,3,73,8,3,1,4,1,4,1,4,1,4,1,5,1,5,1,5,1,5,1,
+        5,3,5,84,8,5,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,6,1,7,1,7,3,7,
+        98,8,7,1,8,1,8,1,8,5,8,103,8,8,10,8,12,8,106,9,8,1,8,3,8,109,8,8,
+        1,8,3,8,112,8,8,1,9,1,9,1,9,1,9,1,9,1,9,3,9,120,8,9,1,10,1,10,1,
         10,5,10,125,8,10,10,10,12,10,128,9,10,1,10,3,10,131,8,10,1,10,3,
-        10,134,8,10,1,11,1,11,1,11,1,11,1,11,1,11,3,11,142,8,11,1,12,1,12,
-        1,12,5,12,147,8,12,10,12,12,12,150,9,12,1,12,3,12,153,8,12,1,12,
-        3,12,156,8,12,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-        1,13,3,13,169,8,13,1,13,3,13,172,8,13,1,13,1,13,1,13,1,13,1,13,1,
-        13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,
-        13,1,13,1,13,1,13,5,13,196,8,13,10,13,12,13,199,9,13,1,14,1,14,1,
-        14,1,14,1,14,1,14,3,14,207,8,14,1,15,1,15,1,16,1,16,1,17,1,17,1,
-        18,1,18,1,19,1,19,1,19,1,19,1,19,1,20,1,20,1,20,5,20,225,8,20,10,
-        20,12,20,228,9,20,1,20,3,20,231,8,20,1,20,3,20,234,8,20,1,21,1,21,
-        1,21,1,21,1,22,1,22,1,22,1,22,1,22,0,1,26,23,0,2,4,6,8,10,12,14,
-        16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,0,4,1,0,16,17,1,0,18,
-        19,1,0,20,25,1,0,28,29,253,0,49,1,0,0,0,2,56,1,0,0,0,4,58,1,0,0,
-        0,6,76,1,0,0,0,8,78,1,0,0,0,10,87,1,0,0,0,12,89,1,0,0,0,14,111,1,
-        0,0,0,16,113,1,0,0,0,18,119,1,0,0,0,20,133,1,0,0,0,22,141,1,0,0,
-        0,24,155,1,0,0,0,26,171,1,0,0,0,28,206,1,0,0,0,30,208,1,0,0,0,32,
-        210,1,0,0,0,34,212,1,0,0,0,36,214,1,0,0,0,38,216,1,0,0,0,40,233,
-        1,0,0,0,42,235,1,0,0,0,44,239,1,0,0,0,46,48,3,2,1,0,47,46,1,0,0,
-        0,48,51,1,0,0,0,49,47,1,0,0,0,49,50,1,0,0,0,50,52,1,0,0,0,51,49,
-        1,0,0,0,52,53,5,0,0,1,53,1,1,0,0,0,54,57,3,4,2,0,55,57,3,12,6,0,
-        56,54,1,0,0,0,56,55,1,0,0,0,57,3,1,0,0,0,58,59,5,1,0,0,59,60,3,30,
-        15,0,60,61,5,2,0,0,61,62,3,6,3,0,62,63,5,3,0,0,63,5,1,0,0,0,64,69,
-        3,8,4,0,65,66,5,4,0,0,66,68,3,8,4,0,67,65,1,0,0,0,68,71,1,0,0,0,
-        69,67,1,0,0,0,69,70,1,0,0,0,70,73,1,0,0,0,71,69,1,0,0,0,72,74,5,
-        4,0,0,73,72,1,0,0,0,73,74,1,0,0,0,74,77,1,0,0,0,75,77,1,0,0,0,76,
-        64,1,0,0,0,76,75,1,0,0,0,77,7,1,0,0,0,78,79,3,30,15,0,79,80,5,5,
-        0,0,80,81,3,10,5,0,81,9,1,0,0,0,82,88,3,30,15,0,83,84,5,6,0,0,84,
-        85,3,10,5,0,85,86,5,7,0,0,86,88,1,0,0,0,87,82,1,0,0,0,87,83,1,0,
-        0,0,88,11,1,0,0,0,89,90,5,8,0,0,90,91,3,30,15,0,91,92,5,9,0,0,92,
-        93,3,14,7,0,93,94,5,10,0,0,94,95,3,18,9,0,95,96,5,2,0,0,96,97,3,
-        20,10,0,97,98,5,3,0,0,98,13,1,0,0,0,99,104,3,16,8,0,100,101,5,4,
-        0,0,101,103,3,16,8,0,102,100,1,0,0,0,103,106,1,0,0,0,104,102,1,0,
-        0,0,104,105,1,0,0,0,105,108,1,0,0,0,106,104,1,0,0,0,107,109,5,4,
-        0,0,108,107,1,0,0,0,108,109,1,0,0,0,109,112,1,0,0,0,110,112,1,0,
-        0,0,111,99,1,0,0,0,111,110,1,0,0,0,112,15,1,0,0,0,113,114,3,30,15,
-        0,114,115,5,5,0,0,115,116,3,10,5,0,116,17,1,0,0,0,117,118,5,11,0,
-        0,118,120,3,10,5,0,119,117,1,0,0,0,119,120,1,0,0,0,120,19,1,0,0,
-        0,121,126,3,22,11,0,122,123,5,12,0,0,123,125,3,22,11,0,124,122,1,
-        0,0,0,125,128,1,0,0,0,126,124,1,0,0,0,126,127,1,0,0,0,127,130,1,
-        0,0,0,128,126,1,0,0,0,129,131,5,12,0,0,130,129,1,0,0,0,130,131,1,
-        0,0,0,131,134,1,0,0,0,132,134,1,0,0,0,133,121,1,0,0,0,133,132,1,
-        0,0,0,134,21,1,0,0,0,135,136,5,13,0,0,136,137,3,30,15,0,137,138,
-        5,14,0,0,138,139,3,26,13,0,139,142,1,0,0,0,140,142,3,26,13,0,141,
-        135,1,0,0,0,141,140,1,0,0,0,142,23,1,0,0,0,143,148,3,26,13,0,144,
-        145,5,4,0,0,145,147,3,26,13,0,146,144,1,0,0,0,147,150,1,0,0,0,148,
-        146,1,0,0,0,148,149,1,0,0,0,149,152,1,0,0,0,150,148,1,0,0,0,151,
-        153,5,4,0,0,152,151,1,0,0,0,152,153,1,0,0,0,153,156,1,0,0,0,154,
-        156,1,0,0,0,155,143,1,0,0,0,155,154,1,0,0,0,156,25,1,0,0,0,157,158,
-        6,13,-1,0,158,159,5,26,0,0,159,160,3,26,13,0,160,161,5,2,0,0,161,
-        162,3,20,10,0,162,168,5,3,0,0,163,164,5,27,0,0,164,165,5,2,0,0,165,
-        166,3,20,10,0,166,167,5,3,0,0,167,169,1,0,0,0,168,163,1,0,0,0,168,
-        169,1,0,0,0,169,172,1,0,0,0,170,172,3,28,14,0,171,157,1,0,0,0,171,
-        170,1,0,0,0,172,197,1,0,0,0,173,174,10,5,0,0,174,175,7,0,0,0,175,
-        196,3,26,13,6,176,177,10,4,0,0,177,178,7,1,0,0,178,196,3,26,13,5,
-        179,180,10,3,0,0,180,181,7,2,0,0,181,196,3,26,13,4,182,183,10,8,
-        0,0,183,184,5,6,0,0,184,185,3,26,13,0,185,186,5,7,0,0,186,196,1,
-        0,0,0,187,188,10,7,0,0,188,189,5,9,0,0,189,190,3,24,12,0,190,191,
-        5,10,0,0,191,196,1,0,0,0,192,193,10,6,0,0,193,194,5,15,0,0,194,196,
-        3,30,15,0,195,173,1,0,0,0,195,176,1,0,0,0,195,179,1,0,0,0,195,182,
-        1,0,0,0,195,187,1,0,0,0,195,192,1,0,0,0,196,199,1,0,0,0,197,195,
-        1,0,0,0,197,198,1,0,0,0,198,27,1,0,0,0,199,197,1,0,0,0,200,207,3,
-        30,15,0,201,207,3,32,16,0,202,207,3,34,17,0,203,207,3,36,18,0,204,
-        207,3,38,19,0,205,207,3,44,22,0,206,200,1,0,0,0,206,201,1,0,0,0,
-        206,202,1,0,0,0,206,203,1,0,0,0,206,204,1,0,0,0,206,205,1,0,0,0,
-        207,29,1,0,0,0,208,209,5,30,0,0,209,31,1,0,0,0,210,211,7,3,0,0,211,
-        33,1,0,0,0,212,213,5,31,0,0,213,35,1,0,0,0,214,215,5,32,0,0,215,
-        37,1,0,0,0,216,217,3,30,15,0,217,218,5,2,0,0,218,219,3,40,20,0,219,
-        220,5,3,0,0,220,39,1,0,0,0,221,226,3,42,21,0,222,223,5,4,0,0,223,
-        225,3,42,21,0,224,222,1,0,0,0,225,228,1,0,0,0,226,224,1,0,0,0,226,
-        227,1,0,0,0,227,230,1,0,0,0,228,226,1,0,0,0,229,231,5,4,0,0,230,
-        229,1,0,0,0,230,231,1,0,0,0,231,234,1,0,0,0,232,234,1,0,0,0,233,
-        221,1,0,0,0,233,232,1,0,0,0,234,41,1,0,0,0,235,236,3,30,15,0,236,
-        237,5,5,0,0,237,238,3,26,13,0,238,43,1,0,0,0,239,240,5,6,0,0,240,
-        241,3,24,12,0,241,242,5,7,0,0,242,45,1,0,0,0,25,49,56,69,73,76,87,
-        104,108,111,119,126,130,133,141,148,152,155,168,171,195,197,206,
-        226,230,233
+        10,134,8,10,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,
+        11,3,11,147,8,11,1,11,1,11,1,11,1,11,1,11,3,11,154,8,11,1,11,1,11,
+        1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,
+        1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,5,11,181,8,11,
+        10,11,12,11,184,9,11,1,12,1,12,1,12,1,12,1,12,1,12,3,12,192,8,12,
+        1,13,1,13,1,14,1,14,1,15,1,15,1,16,1,16,1,17,1,17,1,17,1,17,1,17,
+        1,18,1,18,1,18,5,18,210,8,18,10,18,12,18,213,9,18,1,18,3,18,216,
+        8,18,1,18,3,18,219,8,18,1,19,1,19,1,19,1,19,1,20,1,20,1,20,1,20,
+        1,20,0,1,22,21,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,
+        36,38,40,0,4,1,0,16,17,1,0,18,19,1,0,20,25,1,0,28,29,239,0,45,1,
+        0,0,0,2,52,1,0,0,0,4,54,1,0,0,0,6,72,1,0,0,0,8,74,1,0,0,0,10,83,
+        1,0,0,0,12,85,1,0,0,0,14,97,1,0,0,0,16,111,1,0,0,0,18,119,1,0,0,
+        0,20,133,1,0,0,0,22,153,1,0,0,0,24,191,1,0,0,0,26,193,1,0,0,0,28,
+        195,1,0,0,0,30,197,1,0,0,0,32,199,1,0,0,0,34,201,1,0,0,0,36,218,
+        1,0,0,0,38,220,1,0,0,0,40,224,1,0,0,0,42,44,3,2,1,0,43,42,1,0,0,
+        0,44,47,1,0,0,0,45,43,1,0,0,0,45,46,1,0,0,0,46,48,1,0,0,0,47,45,
+        1,0,0,0,48,49,5,0,0,1,49,1,1,0,0,0,50,53,3,4,2,0,51,53,3,12,6,0,
+        52,50,1,0,0,0,52,51,1,0,0,0,53,3,1,0,0,0,54,55,5,1,0,0,55,56,3,26,
+        13,0,56,57,5,2,0,0,57,58,3,6,3,0,58,59,5,3,0,0,59,5,1,0,0,0,60,65,
+        3,8,4,0,61,62,5,4,0,0,62,64,3,8,4,0,63,61,1,0,0,0,64,67,1,0,0,0,
+        65,63,1,0,0,0,65,66,1,0,0,0,66,69,1,0,0,0,67,65,1,0,0,0,68,70,5,
+        4,0,0,69,68,1,0,0,0,69,70,1,0,0,0,70,73,1,0,0,0,71,73,1,0,0,0,72,
+        60,1,0,0,0,72,71,1,0,0,0,73,7,1,0,0,0,74,75,3,26,13,0,75,76,5,5,
+        0,0,76,77,3,10,5,0,77,9,1,0,0,0,78,84,3,26,13,0,79,80,5,6,0,0,80,
+        81,3,10,5,0,81,82,5,7,0,0,82,84,1,0,0,0,83,78,1,0,0,0,83,79,1,0,
+        0,0,84,11,1,0,0,0,85,86,5,8,0,0,86,87,3,26,13,0,87,88,5,9,0,0,88,
+        89,3,6,3,0,89,90,5,10,0,0,90,91,3,14,7,0,91,92,5,2,0,0,92,93,3,16,
+        8,0,93,94,5,3,0,0,94,13,1,0,0,0,95,96,5,11,0,0,96,98,3,10,5,0,97,
+        95,1,0,0,0,97,98,1,0,0,0,98,15,1,0,0,0,99,104,3,18,9,0,100,101,5,
+        12,0,0,101,103,3,18,9,0,102,100,1,0,0,0,103,106,1,0,0,0,104,102,
+        1,0,0,0,104,105,1,0,0,0,105,108,1,0,0,0,106,104,1,0,0,0,107,109,
+        5,12,0,0,108,107,1,0,0,0,108,109,1,0,0,0,109,112,1,0,0,0,110,112,
+        1,0,0,0,111,99,1,0,0,0,111,110,1,0,0,0,112,17,1,0,0,0,113,114,5,
+        13,0,0,114,115,3,8,4,0,115,116,5,14,0,0,116,117,3,22,11,0,117,120,
+        1,0,0,0,118,120,3,22,11,0,119,113,1,0,0,0,119,118,1,0,0,0,120,19,
+        1,0,0,0,121,126,3,22,11,0,122,123,5,4,0,0,123,125,3,22,11,0,124,
+        122,1,0,0,0,125,128,1,0,0,0,126,124,1,0,0,0,126,127,1,0,0,0,127,
+        130,1,0,0,0,128,126,1,0,0,0,129,131,5,4,0,0,130,129,1,0,0,0,130,
+        131,1,0,0,0,131,134,1,0,0,0,132,134,1,0,0,0,133,121,1,0,0,0,133,
+        132,1,0,0,0,134,21,1,0,0,0,135,136,6,11,-1,0,136,137,5,26,0,0,137,
+        138,3,22,11,0,138,139,5,2,0,0,139,140,3,16,8,0,140,146,5,3,0,0,141,
+        142,5,27,0,0,142,143,5,2,0,0,143,144,3,16,8,0,144,145,5,3,0,0,145,
+        147,1,0,0,0,146,141,1,0,0,0,146,147,1,0,0,0,147,154,1,0,0,0,148,
+        149,5,9,0,0,149,150,3,22,11,0,150,151,5,10,0,0,151,154,1,0,0,0,152,
+        154,3,24,12,0,153,135,1,0,0,0,153,148,1,0,0,0,153,152,1,0,0,0,154,
+        182,1,0,0,0,155,156,10,7,0,0,156,157,7,0,0,0,157,181,3,22,11,8,158,
+        159,10,6,0,0,159,160,7,1,0,0,160,181,3,22,11,7,161,162,10,5,0,0,
+        162,163,7,2,0,0,163,181,3,22,11,6,164,165,10,3,0,0,165,166,5,14,
+        0,0,166,181,3,22,11,4,167,168,10,10,0,0,168,169,5,6,0,0,169,170,
+        3,22,11,0,170,171,5,7,0,0,171,181,1,0,0,0,172,173,10,9,0,0,173,174,
+        5,9,0,0,174,175,3,20,10,0,175,176,5,10,0,0,176,181,1,0,0,0,177,178,
+        10,8,0,0,178,179,5,15,0,0,179,181,3,26,13,0,180,155,1,0,0,0,180,
+        158,1,0,0,0,180,161,1,0,0,0,180,164,1,0,0,0,180,167,1,0,0,0,180,
+        172,1,0,0,0,180,177,1,0,0,0,181,184,1,0,0,0,182,180,1,0,0,0,182,
+        183,1,0,0,0,183,23,1,0,0,0,184,182,1,0,0,0,185,192,3,26,13,0,186,
+        192,3,28,14,0,187,192,3,30,15,0,188,192,3,32,16,0,189,192,3,34,17,
+        0,190,192,3,40,20,0,191,185,1,0,0,0,191,186,1,0,0,0,191,187,1,0,
+        0,0,191,188,1,0,0,0,191,189,1,0,0,0,191,190,1,0,0,0,192,25,1,0,0,
+        0,193,194,5,30,0,0,194,27,1,0,0,0,195,196,7,3,0,0,196,29,1,0,0,0,
+        197,198,5,31,0,0,198,31,1,0,0,0,199,200,5,32,0,0,200,33,1,0,0,0,
+        201,202,3,26,13,0,202,203,5,2,0,0,203,204,3,36,18,0,204,205,5,3,
+        0,0,205,35,1,0,0,0,206,211,3,38,19,0,207,208,5,4,0,0,208,210,3,38,
+        19,0,209,207,1,0,0,0,210,213,1,0,0,0,211,209,1,0,0,0,211,212,1,0,
+        0,0,212,215,1,0,0,0,213,211,1,0,0,0,214,216,5,4,0,0,215,214,1,0,
+        0,0,215,216,1,0,0,0,216,219,1,0,0,0,217,219,1,0,0,0,218,206,1,0,
+        0,0,218,217,1,0,0,0,219,37,1,0,0,0,220,221,3,26,13,0,221,222,5,5,
+        0,0,222,223,3,22,11,0,223,39,1,0,0,0,224,225,5,6,0,0,225,226,3,20,
+        10,0,226,227,5,7,0,0,227,41,1,0,0,0,22,45,52,65,69,72,83,97,104,
+        108,111,119,126,130,133,146,153,180,182,191,211,215,218
     ]
 
 class AevumParser ( Parser ):
@@ -126,31 +120,29 @@ class AevumParser ( Parser ):
     RULE_module = 0
     RULE_declaration = 1
     RULE_struct = 2
-    RULE_field_list = 3
-    RULE_field = 4
+    RULE_variable_list = 3
+    RULE_variable = 4
     RULE_type = 5
     RULE_function = 6
-    RULE_arg_list = 7
-    RULE_arg = 8
-    RULE_return_type = 9
-    RULE_statement_list = 10
-    RULE_statement = 11
-    RULE_expr_list = 12
-    RULE_expr = 13
-    RULE_atom = 14
-    RULE_identifier = 15
-    RULE_boolean_literal = 16
-    RULE_numeric_literal = 17
-    RULE_string_literal = 18
-    RULE_struct_literal = 19
-    RULE_field_initialiser_list = 20
-    RULE_field_initialiser = 21
-    RULE_array_literal = 22
+    RULE_return_type = 7
+    RULE_statement_list = 8
+    RULE_statement = 9
+    RULE_expr_list = 10
+    RULE_expr = 11
+    RULE_atom = 12
+    RULE_identifier = 13
+    RULE_boolean_literal = 14
+    RULE_numeric_literal = 15
+    RULE_string_literal = 16
+    RULE_struct_literal = 17
+    RULE_field_initialiser_list = 18
+    RULE_field_initialiser = 19
+    RULE_array_literal = 20
 
-    ruleNames =  [ "module", "declaration", "struct", "field_list", "field", 
-                   "type", "function", "arg_list", "arg", "return_type", 
-                   "statement_list", "statement", "expr_list", "expr", "atom", 
-                   "identifier", "boolean_literal", "numeric_literal", "string_literal", 
+    ruleNames =  [ "module", "declaration", "struct", "variable_list", "variable", 
+                   "type", "function", "return_type", "statement_list", 
+                   "statement", "expr_list", "expr", "atom", "identifier", 
+                   "boolean_literal", "numeric_literal", "string_literal", 
                    "struct_literal", "field_initialiser_list", "field_initialiser", 
                    "array_literal" ]
 
@@ -235,17 +227,17 @@ class AevumParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 49
+            self.state = 45
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==1 or _la==8:
-                self.state = 46
+                self.state = 42
                 self.declaration()
-                self.state = 51
+                self.state = 47
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 52
+            self.state = 48
             self.match(AevumParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
@@ -288,17 +280,17 @@ class AevumParser ( Parser ):
         localctx = AevumParser.DeclarationContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_declaration)
         try:
-            self.state = 56
+            self.state = 52
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [1]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 54
+                self.state = 50
                 self.struct()
                 pass
             elif token in [8]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 55
+                self.state = 51
                 self.function()
                 pass
             else:
@@ -324,8 +316,8 @@ class AevumParser ( Parser ):
             return self.getTypedRuleContext(AevumParser.IdentifierContext,0)
 
 
-        def field_list(self):
-            return self.getTypedRuleContext(AevumParser.Field_listContext,0)
+        def variable_list(self):
+            return self.getTypedRuleContext(AevumParser.Variable_listContext,0)
 
 
         def getRuleIndex(self):
@@ -346,15 +338,15 @@ class AevumParser ( Parser ):
         self.enterRule(localctx, 4, self.RULE_struct)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 58
+            self.state = 54
             self.match(AevumParser.T__0)
-            self.state = 59
+            self.state = 55
             self.identifier()
-            self.state = 60
+            self.state = 56
             self.match(AevumParser.T__1)
-            self.state = 61
-            self.field_list()
-            self.state = 62
+            self.state = 57
+            self.variable_list()
+            self.state = 58
             self.match(AevumParser.T__2)
         except RecognitionException as re:
             localctx.exception = re
@@ -365,68 +357,68 @@ class AevumParser ( Parser ):
         return localctx
 
 
-    class Field_listContext(ParserRuleContext):
+    class Variable_listContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def field(self, i:int=None):
+        def variable(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(AevumParser.FieldContext)
+                return self.getTypedRuleContexts(AevumParser.VariableContext)
             else:
-                return self.getTypedRuleContext(AevumParser.FieldContext,i)
+                return self.getTypedRuleContext(AevumParser.VariableContext,i)
 
 
         def getRuleIndex(self):
-            return AevumParser.RULE_field_list
+            return AevumParser.RULE_variable_list
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitField_list" ):
-                return visitor.visitField_list(self)
+            if hasattr( visitor, "visitVariable_list" ):
+                return visitor.visitVariable_list(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def field_list(self):
+    def variable_list(self):
 
-        localctx = AevumParser.Field_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_field_list)
+        localctx = AevumParser.Variable_listContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 6, self.RULE_variable_list)
         self._la = 0 # Token type
         try:
-            self.state = 76
+            self.state = 72
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [30]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 64
-                self.field()
-                self.state = 69
+                self.state = 60
+                self.variable()
+                self.state = 65
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
-                        self.state = 65
+                        self.state = 61
                         self.match(AevumParser.T__3)
-                        self.state = 66
-                        self.field() 
-                    self.state = 71
+                        self.state = 62
+                        self.variable() 
+                    self.state = 67
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
 
-                self.state = 73
+                self.state = 69
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==4:
-                    self.state = 72
+                    self.state = 68
                     self.match(AevumParser.T__3)
 
 
                 pass
-            elif token in [3]:
+            elif token in [3, 10]:
                 self.enterOuterAlt(localctx, 2)
 
                 pass
@@ -442,7 +434,7 @@ class AevumParser ( Parser ):
         return localctx
 
 
-    class FieldContext(ParserRuleContext):
+    class VariableContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -458,28 +450,28 @@ class AevumParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return AevumParser.RULE_field
+            return AevumParser.RULE_variable
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitField" ):
-                return visitor.visitField(self)
+            if hasattr( visitor, "visitVariable" ):
+                return visitor.visitVariable(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def field(self):
+    def variable(self):
 
-        localctx = AevumParser.FieldContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 8, self.RULE_field)
+        localctx = AevumParser.VariableContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 8, self.RULE_variable)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 78
+            self.state = 74
             self.identifier()
-            self.state = 79
+            self.state = 75
             self.match(AevumParser.T__4)
-            self.state = 80
+            self.state = 76
             self.type_()
         except RecognitionException as re:
             localctx.exception = re
@@ -547,23 +539,23 @@ class AevumParser ( Parser ):
         localctx = AevumParser.TypeContext(self, self._ctx, self.state)
         self.enterRule(localctx, 10, self.RULE_type)
         try:
-            self.state = 87
+            self.state = 83
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [30]:
                 localctx = AevumParser.BasicTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 82
+                self.state = 78
                 self.identifier()
                 pass
             elif token in [6]:
                 localctx = AevumParser.ArrayTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 83
+                self.state = 79
                 self.match(AevumParser.T__5)
-                self.state = 84
+                self.state = 80
                 self.type_()
-                self.state = 85
+                self.state = 81
                 self.match(AevumParser.T__6)
                 pass
             else:
@@ -589,8 +581,8 @@ class AevumParser ( Parser ):
             return self.getTypedRuleContext(AevumParser.IdentifierContext,0)
 
 
-        def arg_list(self):
-            return self.getTypedRuleContext(AevumParser.Arg_listContext,0)
+        def variable_list(self):
+            return self.getTypedRuleContext(AevumParser.Variable_listContext,0)
 
 
         def return_type(self):
@@ -619,149 +611,24 @@ class AevumParser ( Parser ):
         self.enterRule(localctx, 12, self.RULE_function)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 89
+            self.state = 85
             self.match(AevumParser.T__7)
-            self.state = 90
+            self.state = 86
             self.identifier()
-            self.state = 91
+            self.state = 87
             self.match(AevumParser.T__8)
-            self.state = 92
-            self.arg_list()
-            self.state = 93
+            self.state = 88
+            self.variable_list()
+            self.state = 89
             self.match(AevumParser.T__9)
-            self.state = 94
+            self.state = 90
             self.return_type()
-            self.state = 95
+            self.state = 91
             self.match(AevumParser.T__1)
-            self.state = 96
+            self.state = 92
             self.statement_list()
-            self.state = 97
+            self.state = 93
             self.match(AevumParser.T__2)
-        except RecognitionException as re:
-            localctx.exception = re
-            self._errHandler.reportError(self, re)
-            self._errHandler.recover(self, re)
-        finally:
-            self.exitRule()
-        return localctx
-
-
-    class Arg_listContext(ParserRuleContext):
-        __slots__ = 'parser'
-
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
-            super().__init__(parent, invokingState)
-            self.parser = parser
-
-        def arg(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(AevumParser.ArgContext)
-            else:
-                return self.getTypedRuleContext(AevumParser.ArgContext,i)
-
-
-        def getRuleIndex(self):
-            return AevumParser.RULE_arg_list
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitArg_list" ):
-                return visitor.visitArg_list(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-
-
-    def arg_list(self):
-
-        localctx = AevumParser.Arg_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 14, self.RULE_arg_list)
-        self._la = 0 # Token type
-        try:
-            self.state = 111
-            self._errHandler.sync(self)
-            token = self._input.LA(1)
-            if token in [30]:
-                self.enterOuterAlt(localctx, 1)
-                self.state = 99
-                self.arg()
-                self.state = 104
-                self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,6,self._ctx)
-                while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
-                    if _alt==1:
-                        self.state = 100
-                        self.match(AevumParser.T__3)
-                        self.state = 101
-                        self.arg() 
-                    self.state = 106
-                    self._errHandler.sync(self)
-                    _alt = self._interp.adaptivePredict(self._input,6,self._ctx)
-
-                self.state = 108
-                self._errHandler.sync(self)
-                _la = self._input.LA(1)
-                if _la==4:
-                    self.state = 107
-                    self.match(AevumParser.T__3)
-
-
-                pass
-            elif token in [10]:
-                self.enterOuterAlt(localctx, 2)
-
-                pass
-            else:
-                raise NoViableAltException(self)
-
-        except RecognitionException as re:
-            localctx.exception = re
-            self._errHandler.reportError(self, re)
-            self._errHandler.recover(self, re)
-        finally:
-            self.exitRule()
-        return localctx
-
-
-    class ArgContext(ParserRuleContext):
-        __slots__ = 'parser'
-
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
-            super().__init__(parent, invokingState)
-            self.parser = parser
-
-        def identifier(self):
-            return self.getTypedRuleContext(AevumParser.IdentifierContext,0)
-
-
-        def type_(self):
-            return self.getTypedRuleContext(AevumParser.TypeContext,0)
-
-
-        def getRuleIndex(self):
-            return AevumParser.RULE_arg
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitArg" ):
-                return visitor.visitArg(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-
-
-    def arg(self):
-
-        localctx = AevumParser.ArgContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 16, self.RULE_arg)
-        try:
-            self.enterOuterAlt(localctx, 1)
-            self.state = 113
-            self.identifier()
-            self.state = 114
-            self.match(AevumParser.T__4)
-            self.state = 115
-            self.type_()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -797,17 +664,17 @@ class AevumParser ( Parser ):
     def return_type(self):
 
         localctx = AevumParser.Return_typeContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 18, self.RULE_return_type)
+        self.enterRule(localctx, 14, self.RULE_return_type)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 119
+            self.state = 97
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==11:
-                self.state = 117
+                self.state = 95
                 self.match(AevumParser.T__10)
-                self.state = 118
+                self.state = 96
                 self.type_()
 
 
@@ -849,34 +716,34 @@ class AevumParser ( Parser ):
     def statement_list(self):
 
         localctx = AevumParser.Statement_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 20, self.RULE_statement_list)
+        self.enterRule(localctx, 16, self.RULE_statement_list)
         self._la = 0 # Token type
         try:
-            self.state = 133
+            self.state = 111
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [6, 13, 26, 28, 29, 30, 31, 32]:
+            if token in [6, 9, 13, 26, 28, 29, 30, 31, 32]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 121
+                self.state = 99
                 self.statement()
-                self.state = 126
+                self.state = 104
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,7,self._ctx)
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
-                        self.state = 122
+                        self.state = 100
                         self.match(AevumParser.T__11)
-                        self.state = 123
+                        self.state = 101
                         self.statement() 
-                    self.state = 128
+                    self.state = 106
                     self._errHandler.sync(self)
-                    _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
+                    _alt = self._interp.adaptivePredict(self._input,7,self._ctx)
 
-                self.state = 130
+                self.state = 108
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==12:
-                    self.state = 129
+                    self.state = 107
                     self.match(AevumParser.T__11)
 
 
@@ -937,8 +804,8 @@ class AevumParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def identifier(self):
-            return self.getTypedRuleContext(AevumParser.IdentifierContext,0)
+        def variable(self):
+            return self.getTypedRuleContext(AevumParser.VariableContext,0)
 
         def expr(self):
             return self.getTypedRuleContext(AevumParser.ExprContext,0)
@@ -955,27 +822,27 @@ class AevumParser ( Parser ):
     def statement(self):
 
         localctx = AevumParser.StatementContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 22, self.RULE_statement)
+        self.enterRule(localctx, 18, self.RULE_statement)
         try:
-            self.state = 141
+            self.state = 119
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [13]:
                 localctx = AevumParser.LetStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 135
+                self.state = 113
                 self.match(AevumParser.T__12)
-                self.state = 136
-                self.identifier()
-                self.state = 137
+                self.state = 114
+                self.variable()
+                self.state = 115
                 self.match(AevumParser.T__13)
-                self.state = 138
+                self.state = 116
                 self.expr(0)
                 pass
-            elif token in [6, 26, 28, 29, 30, 31, 32]:
+            elif token in [6, 9, 26, 28, 29, 30, 31, 32]:
                 localctx = AevumParser.ExprStatementContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 140
+                self.state = 118
                 self.expr(0)
                 pass
             else:
@@ -1019,34 +886,34 @@ class AevumParser ( Parser ):
     def expr_list(self):
 
         localctx = AevumParser.Expr_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 24, self.RULE_expr_list)
+        self.enterRule(localctx, 20, self.RULE_expr_list)
         self._la = 0 # Token type
         try:
-            self.state = 155
+            self.state = 133
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [6, 26, 28, 29, 30, 31, 32]:
+            if token in [6, 9, 26, 28, 29, 30, 31, 32]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 143
+                self.state = 121
                 self.expr(0)
-                self.state = 148
+                self.state = 126
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,14,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,11,self._ctx)
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
-                        self.state = 144
+                        self.state = 122
                         self.match(AevumParser.T__3)
-                        self.state = 145
+                        self.state = 123
                         self.expr(0) 
-                    self.state = 150
+                    self.state = 128
                     self._errHandler.sync(self)
-                    _alt = self._interp.adaptivePredict(self._input,14,self._ctx)
+                    _alt = self._interp.adaptivePredict(self._input,11,self._ctx)
 
-                self.state = 152
+                self.state = 130
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==4:
-                    self.state = 151
+                    self.state = 129
                     self.match(AevumParser.T__3)
 
 
@@ -1166,6 +1033,23 @@ class AevumParser ( Parser ):
                 return visitor.visitChildren(self)
 
 
+    class ParenthicalExprContext(ExprContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a AevumParser.ExprContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr(self):
+            return self.getTypedRuleContext(AevumParser.ExprContext,0)
+
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParenthicalExpr" ):
+                return visitor.visitParenthicalExpr(self)
+            else:
+                return visitor.visitChildren(self)
+
+
     class MultplicationContext(ExprContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a AevumParser.ExprContext
@@ -1243,18 +1127,38 @@ class AevumParser ( Parser ):
                 return visitor.visitChildren(self)
 
 
+    class AssignExprContext(ExprContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a AevumParser.ExprContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(AevumParser.ExprContext)
+            else:
+                return self.getTypedRuleContext(AevumParser.ExprContext,i)
+
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAssignExpr" ):
+                return visitor.visitAssignExpr(self)
+            else:
+                return visitor.visitChildren(self)
+
+
 
     def expr(self, _p:int=0):
         _parentctx = self._ctx
         _parentState = self.state
         localctx = AevumParser.ExprContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 26
-        self.enterRecursionRule(localctx, 26, self.RULE_expr, _p)
+        _startState = 22
+        self.enterRecursionRule(localctx, 22, self.RULE_expr, _p)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 171
+            self.state = 153
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [26]:
@@ -1262,154 +1166,178 @@ class AevumParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
 
-                self.state = 158
+                self.state = 136
                 self.match(AevumParser.T__25)
-                self.state = 159
+                self.state = 137
                 self.expr(0)
-                self.state = 160
+                self.state = 138
                 self.match(AevumParser.T__1)
-                self.state = 161
+                self.state = 139
                 self.statement_list()
-                self.state = 162
+                self.state = 140
                 self.match(AevumParser.T__2)
-                self.state = 168
+                self.state = 146
                 self._errHandler.sync(self)
-                la_ = self._interp.adaptivePredict(self._input,17,self._ctx)
+                la_ = self._interp.adaptivePredict(self._input,14,self._ctx)
                 if la_ == 1:
-                    self.state = 163
+                    self.state = 141
                     self.match(AevumParser.T__26)
-                    self.state = 164
+                    self.state = 142
                     self.match(AevumParser.T__1)
-                    self.state = 165
+                    self.state = 143
                     self.statement_list()
-                    self.state = 166
+                    self.state = 144
                     self.match(AevumParser.T__2)
 
 
+                pass
+            elif token in [9]:
+                localctx = AevumParser.ParenthicalExprContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
+                self.state = 148
+                self.match(AevumParser.T__8)
+                self.state = 149
+                self.expr(0)
+                self.state = 150
+                self.match(AevumParser.T__9)
                 pass
             elif token in [6, 28, 29, 30, 31, 32]:
                 localctx = AevumParser.AtomExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 170
+                self.state = 152
                 self.atom()
                 pass
             else:
                 raise NoViableAltException(self)
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 197
+            self.state = 182
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,20,self._ctx)
+            _alt = self._interp.adaptivePredict(self._input,17,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 195
+                    self.state = 180
                     self._errHandler.sync(self)
-                    la_ = self._interp.adaptivePredict(self._input,19,self._ctx)
+                    la_ = self._interp.adaptivePredict(self._input,16,self._ctx)
                     if la_ == 1:
                         localctx = AevumParser.MultplicationContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 173
-                        if not self.precpred(self._ctx, 5):
+                        self.state = 155
+                        if not self.precpred(self._ctx, 7):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
-                        self.state = 174
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
+                        self.state = 156
                         _la = self._input.LA(1)
                         if not(_la==16 or _la==17):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 175
-                        self.expr(6)
+                        self.state = 157
+                        self.expr(8)
                         pass
 
                     elif la_ == 2:
                         localctx = AevumParser.AdditionContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 176
-                        if not self.precpred(self._ctx, 4):
+                        self.state = 158
+                        if not self.precpred(self._ctx, 6):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
-                        self.state = 177
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
+                        self.state = 159
                         _la = self._input.LA(1)
                         if not(_la==18 or _la==19):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 178
-                        self.expr(5)
+                        self.state = 160
+                        self.expr(7)
                         pass
 
                     elif la_ == 3:
                         localctx = AevumParser.ComparisonContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 179
-                        if not self.precpred(self._ctx, 3):
+                        self.state = 161
+                        if not self.precpred(self._ctx, 5):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
-                        self.state = 180
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
+                        self.state = 162
                         _la = self._input.LA(1)
                         if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 66060288) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 181
-                        self.expr(4)
+                        self.state = 163
+                        self.expr(6)
                         pass
 
                     elif la_ == 4:
-                        localctx = AevumParser.ArrayIndexContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = AevumParser.AssignExprContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 182
-                        if not self.precpred(self._ctx, 8):
+                        self.state = 164
+                        if not self.precpred(self._ctx, 3):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
-                        self.state = 183
-                        self.match(AevumParser.T__5)
-                        self.state = 184
-                        self.expr(0)
-                        self.state = 185
-                        self.match(AevumParser.T__6)
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
+                        self.state = 165
+                        self.match(AevumParser.T__13)
+                        self.state = 166
+                        self.expr(4)
                         pass
 
                     elif la_ == 5:
-                        localctx = AevumParser.FunctionCallContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = AevumParser.ArrayIndexContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 187
-                        if not self.precpred(self._ctx, 7):
+                        self.state = 167
+                        if not self.precpred(self._ctx, 10):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
-                        self.state = 188
-                        self.match(AevumParser.T__8)
-                        self.state = 189
-                        self.expr_list()
-                        self.state = 190
-                        self.match(AevumParser.T__9)
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
+                        self.state = 168
+                        self.match(AevumParser.T__5)
+                        self.state = 169
+                        self.expr(0)
+                        self.state = 170
+                        self.match(AevumParser.T__6)
                         pass
 
                     elif la_ == 6:
+                        localctx = AevumParser.FunctionCallContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
+                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
+                        self.state = 172
+                        if not self.precpred(self._ctx, 9):
+                            from antlr4.error.Errors import FailedPredicateException
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 9)")
+                        self.state = 173
+                        self.match(AevumParser.T__8)
+                        self.state = 174
+                        self.expr_list()
+                        self.state = 175
+                        self.match(AevumParser.T__9)
+                        pass
+
+                    elif la_ == 7:
                         localctx = AevumParser.MemberAccessContext(self, AevumParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 192
-                        if not self.precpred(self._ctx, 6):
+                        self.state = 177
+                        if not self.precpred(self._ctx, 8):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
-                        self.state = 193
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
+                        self.state = 178
                         self.match(AevumParser.T__14)
-                        self.state = 194
+                        self.state = 179
                         self.identifier()
                         pass
 
              
-                self.state = 199
+                self.state = 184
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,20,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,17,self._ctx)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1466,44 +1394,44 @@ class AevumParser ( Parser ):
     def atom(self):
 
         localctx = AevumParser.AtomContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 28, self.RULE_atom)
+        self.enterRule(localctx, 24, self.RULE_atom)
         try:
-            self.state = 206
+            self.state = 191
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,21,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,18,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 200
+                self.state = 185
                 self.identifier()
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 201
+                self.state = 186
                 self.boolean_literal()
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 202
+                self.state = 187
                 self.numeric_literal()
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 203
+                self.state = 188
                 self.string_literal()
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 204
+                self.state = 189
                 self.struct_literal()
                 pass
 
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
-                self.state = 205
+                self.state = 190
                 self.array_literal()
                 pass
 
@@ -1542,10 +1470,10 @@ class AevumParser ( Parser ):
     def identifier(self):
 
         localctx = AevumParser.IdentifierContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 30, self.RULE_identifier)
+        self.enterRule(localctx, 26, self.RULE_identifier)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 208
+            self.state = 193
             self.match(AevumParser.IDENT)
         except RecognitionException as re:
             localctx.exception = re
@@ -1579,11 +1507,11 @@ class AevumParser ( Parser ):
     def boolean_literal(self):
 
         localctx = AevumParser.Boolean_literalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 32, self.RULE_boolean_literal)
+        self.enterRule(localctx, 28, self.RULE_boolean_literal)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 210
+            self.state = 195
             _la = self._input.LA(1)
             if not(_la==28 or _la==29):
                 self._errHandler.recoverInline(self)
@@ -1624,10 +1552,10 @@ class AevumParser ( Parser ):
     def numeric_literal(self):
 
         localctx = AevumParser.Numeric_literalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 34, self.RULE_numeric_literal)
+        self.enterRule(localctx, 30, self.RULE_numeric_literal)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 212
+            self.state = 197
             self.match(AevumParser.NUMBER)
         except RecognitionException as re:
             localctx.exception = re
@@ -1663,10 +1591,10 @@ class AevumParser ( Parser ):
     def string_literal(self):
 
         localctx = AevumParser.String_literalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 36, self.RULE_string_literal)
+        self.enterRule(localctx, 32, self.RULE_string_literal)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 214
+            self.state = 199
             self.match(AevumParser.STRING)
         except RecognitionException as re:
             localctx.exception = re
@@ -1707,16 +1635,16 @@ class AevumParser ( Parser ):
     def struct_literal(self):
 
         localctx = AevumParser.Struct_literalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 38, self.RULE_struct_literal)
+        self.enterRule(localctx, 34, self.RULE_struct_literal)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 216
+            self.state = 201
             self.identifier()
-            self.state = 217
+            self.state = 202
             self.match(AevumParser.T__1)
-            self.state = 218
+            self.state = 203
             self.field_initialiser_list()
-            self.state = 219
+            self.state = 204
             self.match(AevumParser.T__2)
         except RecognitionException as re:
             localctx.exception = re
@@ -1756,34 +1684,34 @@ class AevumParser ( Parser ):
     def field_initialiser_list(self):
 
         localctx = AevumParser.Field_initialiser_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 40, self.RULE_field_initialiser_list)
+        self.enterRule(localctx, 36, self.RULE_field_initialiser_list)
         self._la = 0 # Token type
         try:
-            self.state = 233
+            self.state = 218
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [30]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 221
+                self.state = 206
                 self.field_initialiser()
-                self.state = 226
+                self.state = 211
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,22,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,19,self._ctx)
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
-                        self.state = 222
+                        self.state = 207
                         self.match(AevumParser.T__3)
-                        self.state = 223
+                        self.state = 208
                         self.field_initialiser() 
-                    self.state = 228
+                    self.state = 213
                     self._errHandler.sync(self)
-                    _alt = self._interp.adaptivePredict(self._input,22,self._ctx)
+                    _alt = self._interp.adaptivePredict(self._input,19,self._ctx)
 
-                self.state = 230
+                self.state = 215
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==4:
-                    self.state = 229
+                    self.state = 214
                     self.match(AevumParser.T__3)
 
 
@@ -1834,14 +1762,14 @@ class AevumParser ( Parser ):
     def field_initialiser(self):
 
         localctx = AevumParser.Field_initialiserContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 42, self.RULE_field_initialiser)
+        self.enterRule(localctx, 38, self.RULE_field_initialiser)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 235
+            self.state = 220
             self.identifier()
-            self.state = 236
+            self.state = 221
             self.match(AevumParser.T__4)
-            self.state = 237
+            self.state = 222
             self.expr(0)
         except RecognitionException as re:
             localctx.exception = re
@@ -1878,14 +1806,14 @@ class AevumParser ( Parser ):
     def array_literal(self):
 
         localctx = AevumParser.Array_literalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 44, self.RULE_array_literal)
+        self.enterRule(localctx, 40, self.RULE_array_literal)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 239
+            self.state = 224
             self.match(AevumParser.T__5)
-            self.state = 240
+            self.state = 225
             self.expr_list()
-            self.state = 241
+            self.state = 226
             self.match(AevumParser.T__6)
         except RecognitionException as re:
             localctx.exception = re
@@ -1900,7 +1828,7 @@ class AevumParser ( Parser ):
     def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
         if self._predicates == None:
             self._predicates = dict()
-        self._predicates[13] = self.expr_sempred
+        self._predicates[11] = self.expr_sempred
         pred = self._predicates.get(ruleIndex, None)
         if pred is None:
             raise Exception("No predicate with index:" + str(ruleIndex))
@@ -1909,27 +1837,31 @@ class AevumParser ( Parser ):
 
     def expr_sempred(self, localctx:ExprContext, predIndex:int):
             if predIndex == 0:
-                return self.precpred(self._ctx, 5)
-         
-
-            if predIndex == 1:
-                return self.precpred(self._ctx, 4)
-         
-
-            if predIndex == 2:
-                return self.precpred(self._ctx, 3)
-         
-
-            if predIndex == 3:
-                return self.precpred(self._ctx, 8)
-         
-
-            if predIndex == 4:
                 return self.precpred(self._ctx, 7)
          
 
-            if predIndex == 5:
+            if predIndex == 1:
                 return self.precpred(self._ctx, 6)
+         
+
+            if predIndex == 2:
+                return self.precpred(self._ctx, 5)
+         
+
+            if predIndex == 3:
+                return self.precpred(self._ctx, 3)
+         
+
+            if predIndex == 4:
+                return self.precpred(self._ctx, 10)
+         
+
+            if predIndex == 5:
+                return self.precpred(self._ctx, 9)
+         
+
+            if predIndex == 6:
+                return self.precpred(self._ctx, 8)
          
 
 

@@ -1,5 +1,5 @@
 
-from abstract_syntax_tree import Argument, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral
+from abstract_syntax_tree import Assignment, Variable, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral
 from symbols import SymbolTable
 from typenames import ArrayType, BasicType, StructType, void, i8, i32, FunctionType, boolean
 from llvmlite import ir
@@ -42,8 +42,7 @@ class TypeChecker:
         self.symbols.push_scope()
 
         for a in f.args:
-            a.typeclass = self.types[a.typename]
-            self.symbols.define(a.name, a)
+            self.visit_variable(a)
 
         args = [a.typeclass for a in f.args]
         return_type = self.types[f.return_type]
@@ -61,10 +60,15 @@ class TypeChecker:
         else:
             self.visit_expr(s)
 
-    def visit_let(self, s: Let):
-        self.visit_expr(s.value)
-        s.typeclass = s.value.typeclass
+    def visit_variable(self, s: Variable):
+        s.typeclass = self.types[s.typename];
         self.symbols.define(s.name, s)
+    
+    def visit_let(self, s: Let):
+        self.visit_variable(s.variable)
+        self.visit_expr(s.value)
+        assert(s.variable.typeclass == s.value.typeclass)
+        s.typeclass = s.variable.typeclass
 
     def visit_expr(self, s):
         if isinstance(s, FunctionCall):
@@ -72,17 +76,17 @@ class TypeChecker:
             assert (isinstance(f.typeclass, FunctionType))
             s.typeclass = f.typeclass.return_type
             [self.visit_expr(a) for a in s.args]
-        if isinstance(s, Operator):
+        elif isinstance(s, Operator):
             self.visit_expr(s.left)
             self.visit_expr(s.right)
             assert (s.left.typeclass == s.right.typeclass)
             s.typeclass = s.left.typeclass
-        if isinstance(s, Comparison):
+        elif isinstance(s, Comparison):
             self.visit_expr(s.left)
             self.visit_expr(s.right)
             assert (s.left.typeclass == s.right.typeclass)
             s.typeclass = boolean
-        if isinstance(s, IfElse):
+        elif isinstance(s, IfElse):
             self.visit_expr(s.test)
             assert (s.test.typeclass == boolean)
             s.typeclass = void
@@ -94,21 +98,27 @@ class TypeChecker:
                 for t in s.else_statements:
                     self.visit_statement(t)
                 assert(s.if_statements[-1].typeclass == s.else_statements[-1].typeclass)
-        if isinstance(s, MemberAccess):
+        elif isinstance(s, Assignment):
+            self.visit_expr(s.left)
+            self.visit_expr(s.right)
+            assert(s.left.typeclass == s.right.typeclass)
+        elif isinstance(s, MemberAccess):
             self.visit_expr(s.source)
             field_index = s.source.typeclass.member_names[s.field];
             assert (isinstance(s.source.typeclass, StructType))
             s.typeclass = s.source.typeclass.members[field_index].typeclass
-        if isinstance(s, Ident):
+        elif isinstance(s, Ident):
             t = self.symbols.lookup(s.value)
             s.typeclass = t.typeclass
-        if isinstance(s, BooleanLiteral):
+        elif isinstance(s, BooleanLiteral):
             s.typeclass = boolean
-        if isinstance(s, NumericLiteral):
+        elif isinstance(s, NumericLiteral):
             s.typeclass = i32
-        if isinstance(s, StringLiteral):
+        elif isinstance(s, StringLiteral):
             s.typeclass = ArrayType(i8)
-        if isinstance(s, StructLiteral):
+        elif isinstance(s, StructLiteral):
             t = self.symbols.lookup(s.name)
             assert (isinstance(t.typeclass, StructType))
             s.typeclass = t.typeclass
+        else:
+            raise Exception(f"unknown expression {s}")

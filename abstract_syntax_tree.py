@@ -35,15 +35,15 @@ class StringLiteral(Node):
 @dataclass
 class Operator(Node):
     op: str
-    left: Any
-    right: Any
+    left: Node
+    right: Node
 
 
 @dataclass
 class Comparison(Node):
     op: str
-    left: Any
-    right: Any
+    left: Node
+    right: Node
 
 
 @dataclass
@@ -54,28 +54,27 @@ class IfElse(Node):
 
 
 @dataclass
-class Field(Node):
-    name: str
-    typename: str
-
-
-@dataclass
-class Struct(Node):
-    name: str
-    members: list[Field]
-
+class Assignment(Node):
+    left: Node
+    right: Node
 
 @dataclass
-class Argument(Node):
+class Variable(Node):
     name: str
     typename: str
     llvm_value: Optional[Any] = None
 
 
 @dataclass
+class Struct(Node):
+    name: str
+    members: list[Variable]
+
+
+@dataclass
 class Function(Node):
     name: str
-    args: list[Argument]
+    args: list[Variable]
     return_type: str
     statements: list
     llvm_value: Optional[Any] = None
@@ -83,15 +82,15 @@ class Function(Node):
 
 @dataclass
 class Let(Node):
-    name: str
-    value: Any
+    variable: Variable
+    value: Node
     llvm_value: Optional[Any] = None
 
 
 @dataclass
 class FieldInitialiser(Node):
     name: str
-    value: Any
+    value: Node
 
 
 @dataclass
@@ -108,7 +107,7 @@ class FunctionCall(Node):
 
 @dataclass
 class MemberAccess(Node):
-    source: Any
+    source: Node
     field: str
 
 
@@ -125,11 +124,11 @@ class ASTGenerator(AevumVisitor):
         members = self.visit(ctx.children[3])
         return Struct(name, members)
 
-    def visitField_list(self, ctx: AevumParser.Field_listContext):
+    def visitVariable_list(self, ctx: AevumParser.Variable_listContext):
         return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
 
-    def visitField(self, ctx: AevumParser.FieldContext):
-        return Field(
+    def visitVariable(self, ctx: AevumParser.VariableContext):
+        return Variable(
             self.visit(ctx.children[0]).value, self.visit(
                 ctx.children[2]).value
         )
@@ -144,15 +143,6 @@ class ASTGenerator(AevumVisitor):
         # print(f)
         return f
 
-    def visitArg_list(self, ctx: AevumParser.Arg_listContext):
-        return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
-
-    def visitArg(self, ctx: AevumParser.ArgContext):
-        return Argument(
-            self.visit(ctx.children[0]).value, self.visit(
-                ctx.children[2]).value
-        )
-
     def visitBasicType(self, ctx: AevumParser.BasicTypeContext):
         return self.visit(ctx.children[0])
 
@@ -164,9 +154,9 @@ class ASTGenerator(AevumVisitor):
         return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
 
     def visitLetStatement(self, ctx: AevumParser.LetStatementContext):
-        name = self.visit(ctx.children[1]).value
+        variable = self.visit(ctx.children[1])
         expr = self.visit(ctx.children[3])
-        return Let(name, expr)
+        return Let(variable, expr)
 
     def visitExprStatement(self, ctx: AevumParser.ExprStatementContext):
         return self.visit(ctx.children[0])
@@ -194,8 +184,14 @@ class ASTGenerator(AevumVisitor):
     def visitComparison(self, ctx: AevumParser.ComparisonContext):
         return Comparison(self.visit(ctx.children[1]), self.visit(ctx.children[0]), self.visit(ctx.children[2]))
 
-    def visitIfElse(self, ctx:AevumParser.IfElseContext):
+    def visitIfElse(self, ctx: AevumParser.IfElseContext):
         return IfElse(self.visit(ctx.children[1]), self.visit(ctx.children[3]), self.visit(ctx.children[7]) if len(ctx.children) > 7 else list())
+
+    def visitAssignExpr(self, ctx:AevumParser.AssignExprContext):
+        return Assignment(self.visit(ctx.children[0]), self.visit(ctx.children[2]))
+
+    def visitParenthicalExpr(self, ctx:AevumParser.ParenthicalExprContext):
+        return self.visit(ctx.children[1])
 
     def visitAtomExpr(self, ctx: AevumParser.AtomExprContext):
         return self.visit(ctx.children[0])

@@ -1,25 +1,3 @@
-# code = r"""
-# struct Foo {
-#     data: u32,
-#     log: str,
-#     array: [u32]
-# }
-
-# struct Bar {
-#     data: u32,
-# }
-
-# fn main() {
-#     // this is a comment to be ignored!
-#     let foo = Foo{data: 5};
-#     let arr = [1, 2, 3, 4,];
-#     let sum = add(2, 6);
-#     let sum = add(foo.data, 7);
-#     println(sum);
-#     println("Hello, \"World\"!\n");
-#     println(arr[sum + 1] + 2);
-# }
-# """
 
 code = """
 struct Foo {
@@ -33,27 +11,28 @@ fn add(a: i32, b: i32) -> i32 {
 }
 
 fn main() {
-    let foo = Foo{data: 5, log: "hello", number: 11};
+    let foo : Foo = Foo{data: 5, log: "hello", number: 11};
     add(2, foo.data);
     println("Hello, world!");
     println("it's a wonderful world");
-    if foo.number < 10 {
+    let i : i32 = 0;
+    i = 1;
+    if (foo.number - 2) < 10 {
         println("inside if statement");
     } else {
         println("inside else clause");
-    }
+    };
 }
 """
 
 import sys
 from pprint import pprint
-from antlr4 import *
+from antlr4 import InputStream, CommonTokenStream
 from AevumLexer import AevumLexer
 from AevumParser import AevumParser
 from abstract_syntax_tree import build_ast
 import encode
 from module import build_module
-from symbols import setup_symbol_table
 import typecheck
 
 
@@ -65,7 +44,6 @@ tree = parser.module()
 
 ast = build_ast(tree)
 ir = build_module("__main__", ast)
-symbols = setup_symbol_table()
 # pprint(ast)
 for idx, line in enumerate(ir.split("\n")):
     print(idx + 1, line)

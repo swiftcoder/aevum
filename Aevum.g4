@@ -4,27 +4,23 @@ module: declaration* EOF;
 
 declaration: struct | function;
 
-struct: 'struct' identifier '{' field_list '}';
+struct: 'struct' identifier '{' variable_list '}';
 
-field_list: field (',' field)* ','? |;
+variable_list: variable (',' variable)* ','? |;
 
-field: identifier ':' type;
+variable: identifier ':' type;
 
 type: identifier # BasicType | '[' type ']' # ArrayType;
 
 function:
-	'fn' identifier '(' arg_list ')' return_type '{' statement_list '}';
-
-arg_list: arg (',' arg)* ','? |;
-
-arg: identifier ':' type;
+	'fn' identifier '(' variable_list ')' return_type '{' statement_list '}';
 
 return_type: ('->' type)?;
 
 statement_list: statement (';' statement)* ';'? |;
 
 statement:
-	'let' identifier '=' expr	# LetStatement
+	'let' variable '=' expr		# LetStatement
 	| expr						# ExprStatement;
 
 expr_list: expr (',' expr)* ','? |;
@@ -37,6 +33,8 @@ expr:
 	| expr ('+' | '-') expr					# Addition
 	| expr ('==' | '!=' | '<' | '<=' | '>' | '>=') expr 	# Comparison
 	| 'if' expr '{' statement_list '}' ('else' '{' statement_list '}')?		# IfElse
+	| expr '=' expr 						# AssignExpr
+	| '(' expr ')' 							# ParenthicalExpr
 	| atom									# AtomExpr;
 
 atom:

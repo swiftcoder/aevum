@@ -1,12 +1,33 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
-from abstract_syntax_tree import BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral
+from abstract_syntax_tree import Assignment, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral, Variable
 from symbols import SymbolTable
 from llvmlite import ir
 
 from typenames import ArrayType, BasicType, FunctionType, StructType, i32, i8, void, boolean, char_type, ptr_size_type
 
-# Encodes an AST into WAT assembly
+
+class Value:
+    def load(self, _builder: ir.IRBuilder):
+        pass  # override in subclass
+
+
+@dataclass
+class Temporary(Value):
+    data: ir.Value
+
+    def load(self, _builder: ir.IRBuilder):
+        return self.data
+
+
+@dataclass
+class Stored(Temporary):
+    def load(self, builder: ir.IRBuilder):
+        return builder.load(self.data)
+
+# Encodes an AST into LLVM IR
+
+
 class Encoder:
     def __init__(self, module: ir.Module, symbols: SymbolTable):
         self.module = module
@@ -33,14 +54,17 @@ class Encoder:
     def visit_function(self, f: Function):
         self.symbols.define(f.name, f)
         self.symbols.push_scope()
-        
+
         func = ir.Function(self.module, f.typeclass.llvm_type, name=f.name)
         f.llvm_value = func
 
         for a, arg in zip(f.args, func.args):
             arg.name = a.name
-            a.llvm_value = arg
-            self.symbols.define(a.name, a)
+            if arg.type.is_pointer:
+                a.llvm_value = Stored(arg)
+            else:
+                a.llvm_value = Temporary(arg)
+            self.visit_variable(a)
 
         block = func.append_basic_block(name="entry")
         builder = ir.IRBuilder(block)
@@ -49,8 +73,8 @@ class Encoder:
         for s in f.statements:
             last = self.visit_statement(s, builder)
 
-        if last and last.type != ir.VoidType():
-            builder.ret(last)
+        if last and last.data.type != ir.VoidType():
+            builder.ret(last.load(builder))
         else:
             builder.ret_void()
 
@@ -62,34 +86,44 @@ class Encoder:
         else:
             return self.visit_expr(s, builder)
 
-    def visit_let(self, s: Let, builder: ir.IRBuilder):
-        s.llvm_value = self.visit_expr(s.value, builder)
-        s.typeclass = s.value.typeclass
+    def visit_variable(self, s: Variable):
         self.symbols.define(s.name, s)
 
-    def visit_expr(self, s, builder: ir.IRBuilder):
+    def visit_let(self, s: Let, builder: ir.IRBuilder):
+        self.visit_variable(s.variable)
+        value = self.visit_expr(s.value, builder)
+        storage = builder.alloca(
+            s.variable.typeclass.llvm_type, name=s.variable.name)
+        builder.store(value.load(builder), storage)
+        s.variable.llvm_value = Stored(storage)
+
+    def visit_expr(self, s, builder: ir.IRBuilder) -> Value | None:
         if isinstance(s, FunctionCall):
             f = self.symbols.lookup(s.name.value)
             args = [self.visit_expr(a, builder) for a in s.args]
-            return builder.call(f.llvm_value, args)
+            args = [a.load(builder) for a in args]
+            result = builder.call(f.llvm_value, args)
+            if result.type.is_pointer:
+                return Stored(result)
+            else:
+                return Temporary(result)
         if isinstance(s, Operator):
-            left = self.visit_expr(s.left, builder)
-            right = self.visit_expr(s.right, builder)
+            left = self.visit_expr(s.left, builder).load(builder)
+            right = self.visit_expr(s.right, builder).load(builder)
             if s.op == '+':
-                return builder.add(left, right)
+                return Temporary(builder.add(left, right))
             if s.op == '-':
-                return builder.sub(left, right)
+                return Temporary(builder.sub(left, right))
             if s.op == '*':
-                return builder.mul(left, right)
+                return Temporary(builder.mul(left, right))
             if s.op == '/':
-                return builder.udiv(left, right)
+                return Temporary(builder.udiv(left, right))
         if isinstance(s, Comparison):
-            left = self.visit_expr(s.left, builder)
-            right = self.visit_expr(s.right, builder)
-            print("cmp", left, right);
-            return builder.icmp_signed(s.op, left, right)
+            left = self.visit_expr(s.left, builder).load(builder)
+            right = self.visit_expr(s.right, builder).load(builder)
+            return Temporary(builder.icmp_signed(s.op, left, right))
         if isinstance(s, IfElse):
-            condition = self.visit_expr(s.test, builder)
+            condition = self.visit_expr(s.test, builder).load(builder)
             with builder.if_else(condition) as (then, otherwise):
                 with then:
                     for t in s.if_statements:
@@ -97,20 +131,26 @@ class Encoder:
                 with otherwise:
                     for t in s.else_statements:
                         self.visit_statement(t, builder)
+        if isinstance(s, Assignment):
+            target = self.visit_expr(s.left, builder)
+            value = self.visit_expr(s.right, builder)
+            builder.store(value.load(builder), target.data)
+            return value
         if isinstance(s, MemberAccess):
             source = self.visit_expr(s.source, builder)
-            field_index = s.source.typeclass.member_names[s.field];
+            field_index = s.source.typeclass.member_names[s.field]
             pointer: ir.GEPInstr = builder.gep(
-                source, [ir.Constant(i32.llvm_type, 0), ir.Constant(i32.llvm_type, field_index)]
+                source.data, [ir.Constant(i32.llvm_type, 0), ir.Constant(
+                    i32.llvm_type, field_index)]
             )
-            return builder.load(pointer)
+            return Stored(pointer)
         if isinstance(s, Ident):
             t = self.symbols.lookup(s.value)
             return t.llvm_value
         if isinstance(s, BooleanLiteral):
-            return ir.Constant(boolean.llvm_type, int(s.value))
+            return Temporary(ir.Constant(boolean.llvm_type, int(s.value)))
         if isinstance(s, NumericLiteral):
-            return ir.Constant(i32.llvm_type, int(s.value))
+            return Temporary(ir.Constant(i32.llvm_type, int(s.value)))
         if isinstance(s, StringLiteral):
             encoded = bytearray(s.value.encode())
             l = len(encoded)
@@ -122,12 +162,14 @@ class Encoder:
             g.initializer = t(encoded)
             self.next_constant += 1
 
-            return ir.Constant.literal_struct(
+            storage = builder.alloca(ArrayType(i8).llvm_type)
+            builder.store(ir.Constant.literal_struct(
                 [
                     ir.Constant(ptr_size_type.llvm_type, l),
                     g.bitcast(ir.PointerType(char_type.llvm_type)),
                 ]
-            )
+            ), storage)
+            return Stored(storage)
         if isinstance(s, StructLiteral):
             t: Struct = self.symbols.lookup(s.name)
             storage = builder.alloca(t.typeclass.llvm_type)
@@ -137,12 +179,13 @@ class Encoder:
             }
             for i, m in enumerate(t.members):
                 if m.name in initialisers:
+                    value = initialisers[m.name].load(builder)
                     literal = builder.insert_value(
-                        literal, initialisers[m.name], i
+                        literal, value, i
                     )
             builder.store(literal, storage)
-            return storage
+            return Stored(storage)
+        # raise Exception(f"unknown exxpression {s}")
 
     def __repr__(self):
         return str(self.module)
-
