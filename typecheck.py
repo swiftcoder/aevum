@@ -87,17 +87,17 @@ class TypeChecker:
             assert (s.left.typeclass == s.right.typeclass)
             s.typeclass = boolean
         elif isinstance(s, IfElse):
-            self.visit_expr(s.test)
-            assert (s.test.typeclass == boolean)
+            self.visit_expr(s.condition)
+            assert (s.condition.typeclass == boolean)
             s.typeclass = void
-            if len(s.if_statements) > 0:
-                for t in s.if_statements:
+            if len(s.then_statements) > 0:
+                for t in s.then_statements:
                     self.visit_statement(t)
-                s.typeclass = s.if_statements[-1].typeclass
+                s.typeclass = s.then_statements[-1].typeclass
             if len(s.else_statements) > 0:
                 for t in s.else_statements:
                     self.visit_statement(t)
-                assert(s.if_statements[-1].typeclass == s.else_statements[-1].typeclass)
+                assert(s.then_statements[-1].typeclass == s.else_statements[-1].typeclass)
         elif isinstance(s, Assignment):
             self.visit_expr(s.left)
             self.visit_expr(s.right)

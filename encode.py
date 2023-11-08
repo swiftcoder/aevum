@@ -118,19 +118,35 @@ class Encoder:
                 return Temporary(builder.mul(left, right))
             if s.op == '/':
                 return Temporary(builder.udiv(left, right))
+            raise Exception(f"unknown operator {s.op}")
         if isinstance(s, Comparison):
             left = self.visit_expr(s.left, builder).load(builder)
             right = self.visit_expr(s.right, builder).load(builder)
             return Temporary(builder.icmp_signed(s.op, left, right))
         if isinstance(s, IfElse):
-            condition = self.visit_expr(s.test, builder).load(builder)
+            condition = self.visit_expr(s.condition, builder).load(builder)
+            then_block = None
+            else_block = None
             with builder.if_else(condition) as (then, otherwise):
                 with then:
-                    for t in s.if_statements:
-                        self.visit_statement(t, builder)
+                    for t in s.then_statements:
+                        last_then = self.visit_statement(t, builder)
+                    then_block = builder.block
                 with otherwise:
                     for t in s.else_statements:
-                        self.visit_statement(t, builder)
+                        last_else = self.visit_statement(t, builder)
+                    else_block = builder.block
+
+            if s.typeclass != void:
+                phi = builder.phi(s.then_statements[-1].typeclass.llvm_type)
+                if then_block:
+                    phi.add_incoming(last_then.load(builder), then_block)
+                if else_block:
+                    phi.add_incoming(last_else.load(builder), else_block)
+                if phi.type.is_pointer:
+                    return Stored(phi)
+                else:
+                    return Temporary(phi)
         if isinstance(s, Assignment):
             target = self.visit_expr(s.left, builder)
             value = self.visit_expr(s.right, builder)

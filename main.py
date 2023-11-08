@@ -10,7 +10,7 @@ fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
-fn main() {
+fn main() -> i32 {
     let foo : Foo = Foo{data: 5, log: "hello", number: 11};
     add(2, foo.data);
     println("Hello, world!");
@@ -19,8 +19,10 @@ fn main() {
     i = 1;
     if (foo.number - 2) < 10 {
         println("inside if statement");
+        add(2, 3);
     } else {
         println("inside else clause");
+        2;
     };
 }
 """

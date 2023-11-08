@@ -48,8 +48,8 @@ class Comparison(Node):
 
 @dataclass
 class IfElse(Node):
-    test: Node
-    if_statements: list[Node]
+    condition: Node
+    then_statements: list[Node]
     else_statements: list[Node]
 
 
