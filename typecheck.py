@@ -1,5 +1,5 @@
 
-from abstract_syntax_tree import Assignment, Variable, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral
+from abstract_syntax_tree import Assignment, Variable, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral, WhileLoop
 from symbols import SymbolTable
 from typenames import ArrayType, BasicType, StructType, void, i8, i32, FunctionType, boolean
 from llvmlite import ir
@@ -98,6 +98,14 @@ class TypeChecker:
                 for t in s.else_statements:
                     self.visit_statement(t)
                 assert(s.then_statements[-1].typeclass == s.else_statements[-1].typeclass)
+        elif isinstance(s, WhileLoop):
+            self.visit_expr(s.condition)
+            assert (s.condition.typeclass == boolean)
+            s.typeclass = void
+            if len(s.statements) > 0:
+                for t in s.statements:
+                    self.visit_statement(t)
+                s.typeclass = s.statements[-1].typeclass
         elif isinstance(s, Assignment):
             self.visit_expr(s.left)
             self.visit_expr(s.right)

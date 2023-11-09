@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
-from abstract_syntax_tree import Assignment, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral, Variable
+from abstract_syntax_tree import Assignment, BooleanLiteral, Comparison, Function, FunctionCall, Ident, IfElse, Let, MemberAccess, Node, NumericLiteral, Operator, StringLiteral, Struct, StructLiteral, Variable, WhileLoop
 from symbols import SymbolTable
 from llvmlite import ir
 
@@ -147,6 +147,8 @@ class Encoder:
                     return Stored(phi)
                 else:
                     return Temporary(phi)
+        if isinstance(s, WhileLoop):
+            return self.visit_while(s, builder)
         if isinstance(s, Assignment):
             target = self.visit_expr(s.left, builder)
             value = self.visit_expr(s.right, builder)
@@ -201,7 +203,29 @@ class Encoder:
                     )
             builder.store(literal, storage)
             return Stored(storage)
-        # raise Exception(f"unknown exxpression {s}")
+        raise Exception(f"unknown expression {s}")
+
+    def visit_while(self, s: WhileLoop, builder: ir.IRBuilder) -> Value | None:
+        block = builder.basic_block
+        before_loop = builder.append_basic_block(f'{block.name}.before_loop')
+        loop_body = builder.append_basic_block(f'{block.name}.loop_body')
+        after_loop = builder.append_basic_block(f'{block.name}.after_loop')
+
+        builder.branch(before_loop)
+
+        builder.position_at_end(before_loop)
+        condition = self.visit_expr(s.condition, builder).load(builder)
+        builder.cbranch(condition, loop_body, after_loop)
+
+        builder.position_at_end(loop_body)
+        for t in s.statements:
+            last = self.visit_statement(t, builder)
+        builder.branch(before_loop)
+
+        builder.position_at_end(after_loop)
+
+        if s.typeclass != void:
+            return last
 
     def __repr__(self):
         return str(self.module)

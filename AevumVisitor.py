@@ -109,6 +109,11 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by AevumParser#WhileLoop.
+    def visitWhileLoop(self, ctx:AevumParser.WhileLoopContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by AevumParser#AtomExpr.
     def visitAtomExpr(self, ctx:AevumParser.AtomExprContext):
         return self.visitChildren(ctx)

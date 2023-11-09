@@ -54,9 +54,16 @@ class IfElse(Node):
 
 
 @dataclass
+class WhileLoop(Node):
+    condition: Node
+    statements: list[Node]
+
+
+@dataclass
 class Assignment(Node):
     left: Node
     right: Node
+
 
 @dataclass
 class Variable(Node):
@@ -187,10 +194,13 @@ class ASTGenerator(AevumVisitor):
     def visitIfElse(self, ctx: AevumParser.IfElseContext):
         return IfElse(self.visit(ctx.children[1]), self.visit(ctx.children[3]), self.visit(ctx.children[7]) if len(ctx.children) > 7 else list())
 
-    def visitAssignExpr(self, ctx:AevumParser.AssignExprContext):
+    def visitWhileLoop(self, ctx: AevumParser.WhileLoopContext):
+        return WhileLoop(self.visit(ctx.children[1]), self.visit(ctx.children[3]))
+
+    def visitAssignExpr(self, ctx: AevumParser.AssignExprContext):
         return Assignment(self.visit(ctx.children[0]), self.visit(ctx.children[2]))
 
-    def visitParenthicalExpr(self, ctx:AevumParser.ParenthicalExprContext):
+    def visitParenthicalExpr(self, ctx: AevumParser.ParenthicalExprContext):
         return self.visit(ctx.children[1])
 
     def visitAtomExpr(self, ctx: AevumParser.AtomExprContext):

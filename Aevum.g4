@@ -20,8 +20,8 @@ return_type: ('->' type)?;
 statement_list: statement (';' statement)* ';'? |;
 
 statement:
-	'let' variable '=' expr		# LetStatement
-	| expr						# ExprStatement;
+	'let' variable '=' expr						# LetStatement
+	| expr										# ExprStatement;
 
 expr_list: expr (',' expr)* ','? |;
 
@@ -33,6 +33,7 @@ expr:
 	| expr ('+' | '-') expr					# Addition
 	| expr ('==' | '!=' | '<' | '<=' | '>' | '>=') expr 	# Comparison
 	| 'if' expr '{' statement_list '}' ('else' '{' statement_list '}')?		# IfElse
+	| 'while' expr '{' statement_list '}'	# WhileLoop
 	| expr '=' expr 						# AssignExpr
 	| '(' expr ')' 							# ParenthicalExpr
 	| atom									# AtomExpr;
