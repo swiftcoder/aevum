@@ -110,6 +110,7 @@ class TypeChecker:
             self.visit_expr(s.left)
             self.visit_expr(s.right)
             assert(s.left.typeclass == s.right.typeclass)
+            s.typeclass = s.right.typeclass
         elif isinstance(s, MemberAccess):
             self.visit_expr(s.source)
             field_index = s.source.typeclass.member_names[s.field];

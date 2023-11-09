@@ -220,12 +220,18 @@ class Encoder:
         builder.position_at_end(loop_body)
         for t in s.statements:
             last = self.visit_statement(t, builder)
+            last_block = builder.block
         builder.branch(before_loop)
 
         builder.position_at_end(after_loop)
 
         if s.typeclass != void:
-            return last
+            phi = builder.phi(s.typeclass.llvm_type)
+            phi.add_incoming(last.load(builder), last_block)
+            if phi.type.is_pointer:
+                return Stored(phi)
+            else:
+                return Temporary(phi)
 
     def __repr__(self):
         return str(self.module)
