@@ -59,6 +59,11 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by AevumParser#terminated_statement.
+    def visitTerminated_statement(self, ctx:AevumParser.Terminated_statementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by AevumParser#LetStatement.
     def visitLetStatement(self, ctx:AevumParser.LetStatementContext):
         return self.visitChildren(ctx)
@@ -79,6 +84,11 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by AevumParser#TerminatedExpr.
+    def visitTerminatedExpr(self, ctx:AevumParser.TerminatedExprContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by AevumParser#MemberAccess.
     def visitMemberAccess(self, ctx:AevumParser.MemberAccessContext):
         return self.visitChildren(ctx)
@@ -86,11 +96,6 @@ class AevumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by AevumParser#Comparison.
     def visitComparison(self, ctx:AevumParser.ComparisonContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by AevumParser#IfElse.
-    def visitIfElse(self, ctx:AevumParser.IfElseContext):
         return self.visitChildren(ctx)
 
 
@@ -109,11 +114,6 @@ class AevumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by AevumParser#WhileLoop.
-    def visitWhileLoop(self, ctx:AevumParser.WhileLoopContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by AevumParser#AtomExpr.
     def visitAtomExpr(self, ctx:AevumParser.AtomExprContext):
         return self.visitChildren(ctx)
@@ -126,6 +126,16 @@ class AevumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by AevumParser#AssignExpr.
     def visitAssignExpr(self, ctx:AevumParser.AssignExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by AevumParser#IfElse.
+    def visitIfElse(self, ctx:AevumParser.IfElseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by AevumParser#WhileLoop.
+    def visitWhileLoop(self, ctx:AevumParser.WhileLoopContext):
         return self.visitChildren(ctx)
 
 

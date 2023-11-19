@@ -5,7 +5,7 @@ from encode import Encoder
 from symbols import SymbolTable
 
 from typecheck import TypeChecker
-from typenames import ArrayType, FunctionType, void, i8
+from typenames import ArrayType, FunctionType, void, i8, i32
 
 
 def build_module(name: str, ast: list[Function]) -> str:
@@ -25,6 +25,22 @@ def build_module(name: str, ast: list[Function]) -> str:
                 module,
                 ir.FunctionType(ir.VoidType(), [ArrayType(i8).llvm_type]),
                 "println",
+            ),
+        ),
+    )
+
+    symbols.define(
+        "rand",
+        Function(
+            "rand",
+            [],
+            'i32',
+            [],
+            typeclass=FunctionType("rand", i32, []),
+            llvm_value=ir.Function(
+                module,
+                ir.FunctionType(i32.llvm_type, []),
+                "rand",
             ),
         ),
     )

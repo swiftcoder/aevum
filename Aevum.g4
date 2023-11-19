@@ -17,7 +17,12 @@ function:
 
 return_type: ('->' type)?;
 
-statement_list: statement (';' statement)* ';'? |;
+statement_list: terminated_statement statement_list
+	| statement (';' statement_list)?
+	| ';'
+	|;
+
+terminated_statement: terminated_expr;
 
 statement:
 	'let' variable '=' expr						# LetStatement
@@ -32,11 +37,14 @@ expr:
 	| expr ('*' | '/') expr					# Multplication
 	| expr ('+' | '-') expr					# Addition
 	| expr ('==' | '!=' | '<' | '<=' | '>' | '>=') expr 	# Comparison
-	| 'if' expr '{' statement_list '}' ('else' '{' statement_list '}')?		# IfElse
-	| 'while' expr '{' statement_list '}'	# WhileLoop
 	| expr '=' expr 						# AssignExpr
 	| '(' expr ')' 							# ParenthicalExpr
+	| terminated_expr						# TerminatedExpr
 	| atom									# AtomExpr;
+
+terminated_expr:
+	'if' expr '{' statement_list '}' ('else' '{' statement_list '}')?		# IfElse
+	| 'while' expr '{' statement_list '}'	# WhileLoop;
 
 atom:
 	identifier

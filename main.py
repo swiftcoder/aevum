@@ -15,7 +15,7 @@ fn loop() {
     while i < 3 {
         println("loop iteration");
         i = i + 1;
-    };
+    }
     println("loop done");
 }
 
@@ -24,15 +24,15 @@ fn main() {
     add(2, foo.data);
     println("Hello, world!");
     println("it's a wonderful world");
-    if (foo.number - 2) < 10 {
+    if rand() == 1 {
         println("inside if statement");
         add(2, 3);
     } else {
         println("inside else clause");
         2;
-    };
+    }
 
-    loop();
+    loop()
 }
 """
 
@@ -56,8 +56,8 @@ tree = parser.module()
 ast = build_ast(tree)
 ir = build_module("__main__", ast)
 # pprint(ast)
-for idx, line in enumerate(ir.split("\n")):
-    print(idx + 1, line)
+# for idx, line in enumerate(ir.split("\n")):
+#     print(idx + 1, line)
 
 import llvmlite.binding as llvm
 from ctypes import CFUNCTYPE, c_int32, c_void_p, string_at, cast
@@ -66,6 +66,15 @@ llvm.initialize()
 llvm.initialize_native_target()
 llvm.initialize_native_asmprinter()
 
+module = llvm.parse_assembly(ir)
+pmb = llvm.create_pass_manager_builder()
+pm = llvm.create_module_pass_manager()
+pmb.populate(pm)
+pm.run(module)
+
+optimised_ir = str(module)
+for idx, line in enumerate(optimised_ir.split("\n")):
+    print(idx + 1, line)
 
 def println(l: c_int32, s: c_void_p):
     value = string_at(s, l)
@@ -75,12 +84,20 @@ def println(l: c_int32, s: c_void_p):
 println_type = CFUNCTYPE(None, c_int32, c_void_p)
 println_func = println_type(println)
 
+def rand():
+    import random
+    return random.getrandbits(1)
+
+rand_type = CFUNCTYPE(c_int32)
+rand_func = rand_type(rand)
+
 lljit = llvm.create_lljit_compiler()
 rt = (
     llvm.JITLibraryBuilder()
-    .add_ir(ir)
+    .add_ir(optimised_ir)
     .export_symbol("main")
     .import_symbol("println", cast(println_func, c_void_p).value)
+    .import_symbol("rand", cast(rand_func, c_void_p).value)
     .link(lljit, "__main__")
 )
 

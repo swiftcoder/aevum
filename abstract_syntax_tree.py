@@ -158,7 +158,19 @@ class ASTGenerator(AevumVisitor):
             return self.visit(ctx.children[1])
 
     def visitStatement_list(self, ctx: AevumParser.Statement_listContext):
-        return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
+        children = ctx.children
+        if not children:
+            return []
+        first = self.visit(children.pop(0))
+        if len(children) == 0:
+            return [first]
+        next = children.pop(0)
+        if next.getText() == ';':
+            next = children.pop(0)
+        return [first] + self.visit(next)
+
+    def visitTerminated_statement(self, ctx:AevumParser.Terminated_statementContext):
+        return self.visit(ctx.children[0])
 
     def visitLetStatement(self, ctx: AevumParser.LetStatementContext):
         variable = self.visit(ctx.children[1])
@@ -170,6 +182,9 @@ class ASTGenerator(AevumVisitor):
 
     def visitExpr_list(self, ctx: AevumParser.Expr_listContext):
         return [self.visit(c) for i, c in enumerate(ctx.children or []) if i % 2 == 0]
+
+    def visitTerminatedExpr(self, ctx:AevumParser.TerminatedExprContext):
+        return self.visit(ctx.children[0])
 
     def visitFunctionCall(self, ctx: AevumParser.FunctionCallContext):
         return FunctionCall(
